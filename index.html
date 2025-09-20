@@ -74,11 +74,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-4 text-gray-700">Datos del Emisor</h2>
-                    <div class="grid grid-cols-1 gap-4">
-                        <input type="text" id="emisor" placeholder="Nombre o empresa" class="w-full">
-                        <input type="text" id="nif" placeholder="NIF/CIF" class="w-full">
-                        <input type="text" id="direccion" placeholder="Dirección" class="w-full">
-                        <input type="text" id="telefono" placeholder="Teléfono" class="w-full">
+                    <div class="space-y-2 text-gray-700">
+                        <p><strong>Nombre:</strong> Francisco Javier Pazó Martínez</p>
+                        <p><strong>DNI:</strong> 76779007Q</p>
+                        <p><strong>Dirección:</strong> Calle Carcasía 44B 1ºF edf Los Rosales.</p>
+                        <p><strong>C.P. y Ciudad:</strong> 15200 Noia</p>
                     </div>
                 </div>
 
@@ -138,7 +138,7 @@
                     <p id="previewEmisor" class="text-gray-600"></p>
                     <p id="previewNif" class="text-gray-600"></p>
                     <p id="previewDireccion" class="text-gray-600"></p>
-                    <p id="previewTelefono" class="text-gray-600"></p>
+                    <p id="previewCpCiudad" class="text-gray-600"></p>
                 </div>
                 <div class="w-1/2 text-right">
                     <h2 class="text-2xl font-bold text-gray-800">FACTURA</h2>
@@ -281,12 +281,12 @@
                 const fechaInput = document.getElementById('fecha').value;
                 document.getElementById('invoiceDate').textContent = fechaInput ? new Date(fechaInput).toLocaleDateString('es-ES') : today.toLocaleDateString('es-ES');
 
-                // Emisor y Cliente
-                document.getElementById('previewEmisor').textContent = document.getElementById('emisor').value;
-                document.getElementById('previewNif').textContent = 'NIF/CIF: ' + document.getElementById('nif').value;
-                document.getElementById('previewDireccion').textContent = document.getElementById('direccion').value;
-                document.getElementById('previewTelefono').textContent = document.getElementById('telefono').value;
-                
+                // Emisor (Datos Fijos) y Cliente
+                document.getElementById('previewEmisor').textContent = 'Francisco Javier Pazó Martínez';
+                document.getElementById('previewNif').textContent = 'DNI: 76779007Q';
+                document.getElementById('previewDireccion').textContent = 'Calle Carcasía 44B 1ºF edf Los Rosales.';
+                document.getElementById('previewCpCiudad').textContent = '15200 Noia';
+
                 document.getElementById('previewCliente').textContent = document.getElementById('cliente').value;
                 document.getElementById('previewNifCliente').textContent = 'NIF/CIF: ' + document.getElementById('nifCliente').value;
                 document.getElementById('previewDireccionCliente').textContent = document.getElementById('direccionCliente').value;
