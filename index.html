@@ -84,11 +84,12 @@
 
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-4 text-gray-700">Datos del Cliente</h2>
-                    <div class="grid grid-cols-1 gap-4">
-                        <input type="text" id="cliente" placeholder="Nombre del cliente" class="w-full">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="cliente" placeholder="Nombre del cliente" class="w-full md:col-span-2">
                         <input type="text" id="nifCliente" placeholder="NIF del cliente" class="w-full">
                         <input type="text" id="direccionCliente" placeholder="Dirección del cliente" class="w-full">
                         <input type="date" id="fecha" class="w-full">
+                        <input type="text" id="numeroFacturaManual" placeholder="Número de Factura" class="w-full">
                     </div>
                 </div>
             </div>
@@ -202,8 +203,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             feather.replace();
 
-            let invoiceCounter = localStorage.getItem('invoiceCounter') || 1;
-
             const createItemRow = () => {
                 const tbody = document.getElementById('itemsBody');
                 const newRow = document.createElement('tr');
@@ -270,14 +269,11 @@
 
             document.getElementById('generateInvoice').addEventListener('click', () => {
                 const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const invoiceNumber = `${year}/${month}/${String(invoiceCounter).padStart(3, '0')}`;
                 
-                invoiceCounter++;
-                localStorage.setItem('invoiceCounter', invoiceCounter);
-
-                document.getElementById('invoiceNumber').textContent = invoiceNumber;
+                // Usar el número de factura manual
+                const manualInvoiceNumber = document.getElementById('numeroFacturaManual').value;
+                document.getElementById('invoiceNumber').textContent = manualInvoiceNumber;
+                
                 const fechaInput = document.getElementById('fecha').value;
                 document.getElementById('invoiceDate').textContent = fechaInput ? new Date(fechaInput).toLocaleDateString('es-ES') : today.toLocaleDateString('es-ES');
 
@@ -351,7 +347,7 @@
                         heightLeft -= pageHeight;
                     }
                     
-                    const invoiceNumber = document.getElementById('invoiceNumber').textContent.replace(/\//g, '-');
+                    const invoiceNumber = document.getElementById('invoiceNumber').textContent.replace(/[\\/]/g, '-');
                     pdf.save(`factura-${invoiceNumber}.pdf`);
                 });
             });
