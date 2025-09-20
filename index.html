@@ -97,27 +97,38 @@
         .invoice-table tr:hover {
             background-color: #f1f5f9;
         }
-        /* Estilos adicionales para los nuevos elementos */
         .item-row input, .item-row textarea {
             padding: 0.5rem;
         }
+        /* Ajuste para la vista de la factura en el navegador */
+        #invoice-container {
+            width: 210mm; /* Ancho de un A4 */
+            min-height: 297mm; /* Alto de un A4 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30mm; /* Márgenes para el contenido */
+            box-sizing: border-box;
+        }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center p-8">
-    <div id="invoice-container" class="w-full max-w-4xl p-8 bg-white shadow-xl rounded-lg">
+<body class="bg-gray-100 flex flex-col items-center justify-center p-8">
+
+    <div id="invoice-container" class="bg-white rounded-lg">
 
         <div class="flex justify-between items-start mb-8">
             <div class="flex-1 pr-4">
                 <div class="flex-col">
                     <h2 class="text-xl font-bold mb-2">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h2>
-                    <textarea id="emisor-address" rows="4" class="text-sm p-2 w-full border border-gray-300 rounded-md" placeholder="76779007Q&#10;C/ Carcasía 44B - 1F&#10;15200 Noia - A Coruña"></textarea>
+                    <input type="text" id="emisor-nif" class="text-sm p-2 w-full border border-gray-300 rounded-md mb-1" placeholder="NIF/DNI">
+                    <input type="text" id="emisor-calle" class="text-sm p-2 w-full border border-gray-300 rounded-md mb-1" placeholder="Calle y número">
+                    <input type="text" id="emisor-cp-ciudad" class="text-sm p-2 w-full border border-gray-300 rounded-md mb-1" placeholder="Código postal y ciudad">
                 </div>
             </div>
 
             <div class="flex-1 pl-4 text-right">
                 <div class="flex-col">
                     <input type="text" id="receptor-name" class="text-xl font-bold mb-2 w-full text-right" placeholder="Nombre del receptor">
-                    <textarea id="receptor-address" rows="4" class="text-sm p-2 w-full text-right border border-gray-300 rounded-md" placeholder="Dirección del receptor"></textarea>
+                    <input type="text" id="receptor-calle" class="text-sm p-2 w-full text-right border border-gray-300 rounded-md mb-1" placeholder="Calle y número">
+                    <input type="text" id="receptor-cp-ciudad" class="text-sm p-2 w-full text-right border border-gray-300 rounded-md mb-1" placeholder="Código postal y ciudad">
                 </div>
             </div>
         </div>
@@ -188,6 +199,12 @@
 
     </div>
 
+    <div class="mt-6">
+        <button id="export-pdf-btn" class="px-6 py-3 bg-blue-600 text-white rounded-md text-lg font-medium hover:bg-blue-700 transition-colors">
+            Exportar a PDF
+        </button>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const dateInput = document.getElementById('fecha');
@@ -195,6 +212,8 @@
             const itemsBody = document.getElementById('items-body');
             const addItemBtn = document.getElementById('add-item-btn');
             const ivaSelector = document.getElementById('iva-selector');
+            const exportPdfBtn = document.getElementById('export-pdf-btn');
+            const invoiceContainer = document.getElementById('invoice-container');
             
             // Set default date to today
             const today = new Date().toISOString().split('T')[0];
@@ -262,8 +281,59 @@
                 updateTotals();
             }
 
+            // Function to export as PDF
+            function exportPDF() {
+                // Ocultamos los botones y los inputs no esenciales para el PDF
+                const nonPrintableElements = [addItemBtn, exportPdfBtn, ...document.querySelectorAll('.item-row input, .item-row textarea, #emisor-nif, #emisor-calle, #emisor-cp-ciudad, #receptor-name, #receptor-calle, #receptor-cp-ciudad')];
+                nonPrintableElements.forEach(el => el.style.display = 'none');
+                
+                // Aseguramos que los textos de los inputs se muestren
+                const printableTexts = [
+                    ...document.querySelectorAll('#emisor-nif, #emisor-calle, #emisor-cp-ciudad, #receptor-name, #receptor-calle, #receptor-cp-ciudad, #fecha, #num-factura, #cif-nif, #obra, .item-descripcion, .item-cant, .item-precio, .item-importe')
+                ];
+                printableTexts.forEach(el => {
+                    if (el.tagName === 'INPUT') {
+                        el.parentNode.innerHTML += `<span>${el.value}</span>`;
+                        el.style.display = 'none';
+                    }
+                });
+
+                html2canvas(invoiceContainer, {
+                    scale: 2,
+                    useCORS: true
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jspdf.jsPDF({
+                        orientation: 'p',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+                    
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    
+                    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                    const newWidth = imgWidth * ratio;
+                    const newHeight = imgHeight * ratio;
+                    
+                    const x = (pdfWidth - newWidth) / 2;
+                    const y = (pdfHeight - newHeight) / 2;
+                    
+                    pdf.addImage(imgData, 'PNG', x, y, newWidth, newHeight);
+                    pdf.save(`Factura_${invoiceNumberInput.value.replace(/\//g, '-')}.pdf`);
+
+                    // Restauramos los elementos de la interfaz después de la exportación
+                    nonPrintableElements.forEach(el => el.style.display = 'block');
+                    document.querySelectorAll('#invoice-container span').forEach(el => el.remove());
+                });
+            }
+
             addItemBtn.addEventListener('click', addItem);
             ivaSelector.addEventListener('change', updateTotals);
+            exportPdfBtn.addEventListener('click', exportPDF);
         });
     </script>
 </body>
