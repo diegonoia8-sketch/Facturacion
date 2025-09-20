@@ -7,131 +7,142 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f0f4f8;
-            --container-bg: #ffffff;
-            --text-color: #2c3e50;
-            --text-light: #7f8c8d;
-            --primary-color: #3498db;
-            --accent-color: #2980b9;
-            --border-color: #e0e6ed;
-            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
-            --shadow-medium: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --bg-color: #f8f9fa;
+            --invoice-bg: #ffffff;
+            --text-color: #343a40;
+            --text-muted: #6c757d;
+            --primary-color: #007bff;
+            --accent-color: #0056b3;
+            --border-color: #dee2e6;
+            --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 16px rgba(0, 0, 0, 0.08);
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.6;
             padding: 2rem 1rem;
         }
-
+        
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: auto;
-            border-radius: 1rem;
+            border-radius: 0.5rem;
             box-shadow: var(--shadow-medium);
             overflow: hidden;
-            border: 1px solid var(--border-color);
         }
 
         .invoice-paper {
-            background-color: var(--container-bg);
+            background-color: var(--invoice-bg);
             padding: 3rem;
         }
 
         .input-field {
             border: 1px solid var(--border-color);
             background-color: #f8f9fa;
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease-in-out;
         }
 
         .input-field:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            box-shadow: var(--shadow-light);
         }
 
         .btn-primary {
             background-color: var(--primary-color);
             color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            transition: background-color 0.2s;
-            box-shadow: var(--shadow-light);
         }
 
         .btn-primary:hover {
             background-color: var(--accent-color);
         }
-
+        
         .btn-secondary {
-            background-color: #ecf0f1;
-            color: var(--text-color);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 400;
-            transition: background-color 0.2s;
+            background-color: #e9ecef;
+            color: var(--text-muted);
         }
 
         .btn-secondary:hover {
-            background-color: #bdc3c7;
+            background-color: #ced4da;
         }
 
         .invoice-table th, .invoice-table td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         
         .invoice-table th {
-            font-family: 'Roboto', sans-serif;
-            font-weight: 700;
-            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
 
         .total-box {
-            background-color: #ecf0f1;
+            background-color: #f8f9fa;
             padding: 1.5rem;
             border-radius: 0.5rem;
             box-shadow: var(--shadow-light);
-            border: 1px solid #dcdfe4;
+            border: 1px solid #e9ecef;
         }
 
-        .total-box span {
-            font-family: 'Playfair Display', serif;
-        }
-
-        /* Ocultar elementos en la vista de impresión */
+        /* Estilos específicos para la impresión */
         @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
             .no-print {
                 display: none !important;
             }
-            body {
-                padding: 0;
-                background-color: white;
-            }
-            #invoice-container {
+            .container {
                 box-shadow: none;
                 width: 210mm;
                 height: 297mm;
-                padding: 20mm;
+                padding: 0;
             }
             .invoice-paper {
+                padding: 20mm;
+            }
+            .input-field {
+                border: none;
+                background-color: transparent;
                 padding: 0;
+                box-shadow: none;
+                display: block;
             }
             .input-as-text {
                 display: block !important;
                 margin-bottom: 0.5rem;
+            }
+            .invoice-table th, .invoice-table td {
+                border-bottom: 1px solid #adb5bd;
+            }
+            .total-box {
+                background-color: white;
+                border: none;
+                box-shadow: none;
+            }
+            .print-hidden-input {
+                display: none !important;
             }
         }
     </style>
@@ -141,40 +152,41 @@
     <div id="invoice-container" class="container">
         <div class="invoice-paper">
             <div class="flex justify-between items-start mb-12">
-                <div id="receptor-info-display" class="w-1/2">
-                    <h2 class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">Factura</h2>
-                    <div id="receptor-inputs" class="no-print mt-4">
-                        <input type="text" id="receptor-name" class="input-field w-full mb-2" placeholder="Nombre del receptor">
-                        <input type="text" id="receptor-calle" class="input-field w-full mb-2" placeholder="Calle y número">
-                        <input type="text" id="receptor-cp-ciudad" class="input-field w-full" placeholder="Código postal y ciudad">
-                    </div>
+                <div class="text-left">
+                    <h1 class="text-3xl font-bold" style="font-family: 'Cormorant Garamond', serif;">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h1>
+                    <p class="text-sm text-muted mt-2">76779007Q</p>
+                    <p class="text-sm text-muted">Calle Carcasía 44B 1ºF edf Los Rosales</p>
+                    <p class="text-sm text-muted">Noia 15200</p>
                 </div>
                 
-                <div class="text-right w-1/2">
-                    <h1 class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h1>
-                    <p class="text-sm text-gray-500 mt-2">76779007Q</p>
-                    <p class="text-sm text-gray-500">Calle Carcasía 44B 1ºF edf Los Rosales</p>
-                    <p class="text-sm text-gray-500">Noia 15200</p>
+                <div id="receptor-container" class="text-right">
+                    <h2 class="text-3xl font-bold" style="font-family: 'Cormorant Garamond', serif;">Factura</h2>
+                    <div id="receptor-inputs" class="no-print mt-4">
+                        <input type="text" id="receptor-name" class="input-field w-full md:w-auto mb-2" placeholder="Nombre del receptor">
+                        <input type="text" id="receptor-calle" class="input-field w-full md:w-auto mb-2" placeholder="Calle y número">
+                        <input type="text" id="receptor-cp-ciudad" class="input-field w-full md:w-auto" placeholder="Código postal y ciudad">
+                    </div>
+                    <div id="receptor-print-info" class="print-only" style="display: none;"></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 info-grid">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div>
-                    <label class="text-xs font-semibold text-gray-500 block mb-1">FECHA</label>
+                    <label class="text-xs font-semibold text-muted block mb-1">FECHA</label>
                     <input type="date" id="fecha" class="input-field w-full">
                 </div>
                 <div>
-                    <label class="text-xs font-semibold text-gray-500 block mb-1">Nº FACTURA</label>
+                    <label class="text-xs font-semibold text-muted block mb-1">Nº FACTURA</label>
                     <input type="text" id="num-factura" class="input-field w-full" placeholder="Introduce el Nº de factura">
                 </div>
                 <div>
-                    <label class="text-xs font-semibold text-gray-500 block mb-1">C.I.F./N.I.F.</label>
+                    <label class="text-xs font-semibold text-muted block mb-1">C.I.F./N.I.F.</label>
                     <input type="text" id="cif-nif" class="input-field w-full" placeholder="Introduce el CIF">
                 </div>
             </div>
 
             <div class="mb-12">
-                <label class="text-xs font-semibold text-gray-500 block mb-1">OBRA</label>
+                <label class="text-xs font-semibold text-muted block mb-1">OBRA</label>
                 <input type="text" id="obra" class="input-field w-full" placeholder="Nombre de obra">
             </div>
 
@@ -192,14 +204,14 @@
                     <tbody id="items-body">
                         </tbody>
                 </table>
-                <button id="add-item-btn" class="no-print btn-secondary mt-6 px-4 py-2 rounded-md font-medium text-sm">
+                <button id="add-item-btn" class="no-print btn btn-secondary mt-6 px-4 py-2 text-sm">
                     Añadir partida
                 </button>
             </div>
             
             <div class="flex flex-col md:flex-row justify-between items-end">
                 <div class="flex-1 mt-6 md:mt-0">
-                    <p class="text-xs text-gray-500">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
+                    <p class="text-xs text-muted">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
                 </div>
 
                 <div class="w-full md:w-1/2 total-box mt-6 md:mt-0">
@@ -213,7 +225,7 @@
                             <option value="21">21%</option>
                             <option value="0">0% (Sin IVA)</option>
                         </select>
-                        <span id="iva-print-text" class="text-xl font-bold" style="display: none;"></span>
+                        <span id="iva-print-text" class="text-lg font-semibold" style="display: none;"></span>
                         <span id="iva" class="text-xl font-bold">0.00 €</span>
                     </div>
                     <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300">
@@ -226,13 +238,13 @@
     </div>
 
     <div class="mt-6 no-print">
-        <button id="export-pdf-btn" class="btn-primary">
+        <button id="export-pdf-btn" class="btn btn-primary">
             Exportar a PDF
         </button>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
+        document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('fecha');
             const itemsBody = document.getElementById('items-body');
             const addItemBtn = document.getElementById('add-item-btn');
@@ -240,11 +252,9 @@
             const exportPdfBtn = document.getElementById('export-pdf-btn');
             const invoiceContainer = document.getElementById('invoice-container');
             
-            // Set default date to today
             const today = new Date().toISOString().split('T')[0];
             dateInput.value = today;
             
-            // Function to update totals
             function updateTotals() {
                 let subtotal = 0;
                 itemsBody.querySelectorAll('tr').forEach(row => {
@@ -263,7 +273,6 @@
                 document.getElementById('total').textContent = `${total.toFixed(2)} €`;
             }
 
-            // Function to calculate and update item total
             function updateItemTotal(row) {
                 const cant = parseFloat(row.querySelector('.item-cant').value) || 0;
                 const precio = parseFloat(row.querySelector('.item-precio').value) || 0;
@@ -272,7 +281,6 @@
                 updateTotals();
             }
 
-            // Function to add a new item row
             function addItem() {
                 const newRow = document.createElement('tr');
                 newRow.className = 'item-row';
@@ -281,7 +289,7 @@
                     <td><input type="number" class="input-field w-full item-cant" value="0" step="any"></td>
                     <td><input type="number" class="input-field w-full item-precio" value="0.00" step="0.01"></td>
                     <td><input type="text" class="input-field w-full item-importe" value="0.00" readonly></td>
-                    <td class="no-print"><button type="button" class="remove-item-btn btn-secondary text-xs px-2 py-1">Eliminar</button></td>
+                    <td class="no-print"><button type="button" class="remove-item-btn btn btn-secondary text-sm">Eliminar</button></td>
                 `;
                 
                 itemsBody.appendChild(newRow);
@@ -300,93 +308,77 @@
                 updateTotals();
             }
 
-            // Function to export as PDF
             function exportPDF() {
-                // Ocultamos elementos de la interfaz
-                document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
-                
-                // Convertimos los inputs a texto y los mostramos en la factura
-                document.querySelectorAll('.input-field').forEach(input => {
-                    const value = input.value;
-                    if (value) {
+                // Preparamos el DOM para la impresión
+                const inputs = document.querySelectorAll('.input-field');
+                inputs.forEach(input => {
+                    if (input.value) {
                         const span = document.createElement('span');
-                        span.textContent = value;
+                        span.textContent = input.value;
                         span.className = 'input-as-text';
                         input.parentNode.insertBefore(span, input);
                     }
-                    input.style.display = 'none';
+                    input.classList.add('print-hidden-input');
                 });
                 
-                // Mostrar los datos del receptor de forma simétrica
-                const receptorInputsDiv = document.getElementById('receptor-inputs');
+                // Mover los datos del receptor al contenedor de impresión
                 const receptorName = document.getElementById('receptor-name').value;
                 const receptorCalle = document.getElementById('receptor-calle').value;
                 const receptorCPCiudad = document.getElementById('receptor-cp-ciudad').value;
                 
-                if (receptorName || receptorCalle || receptorCPCiudad) {
-                    const receptorDisplayDiv = document.createElement('div');
-                    receptorDisplayDiv.className = 'w-1/2 print-only';
-                    receptorDisplayDiv.innerHTML = `
-                        <h2 class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">${receptorName}</h2>
-                        <p class="text-sm text-gray-500 mt-2">${receptorCalle}</p>
-                        <p class="text-sm text-gray-500">${receptorCPCiudad}</p>
-                    `;
-                    document.getElementById('receptor-info-display').appendChild(receptorDisplayDiv);
-                }
-
-                // Ocultar el div de inputs del receptor en la impresión
+                document.getElementById('receptor-print-info').innerHTML = `
+                    <p class="text-sm font-bold">${receptorName}</p>
+                    <p class="text-sm text-muted">${receptorCalle}</p>
+                    <p class="text-sm text-muted">${receptorCPCiudad}</p>
+                `;
                 document.getElementById('receptor-inputs').style.display = 'none';
+                document.getElementById('receptor-print-info').style.display = 'block';
+
+                // Ocultar elementos de la interfaz
+                document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
                 
-                // Mostramos el valor del IVA como texto para la impresión
+                // Mostrar el valor del IVA como texto para la impresión
                 const ivaText = ivaSelector.options[ivaSelector.selectedIndex].text;
                 const ivaPrintText = document.getElementById('iva-print-text');
                 ivaPrintText.textContent = ivaText;
                 ivaPrintText.style.display = 'inline';
 
-                // Añadimos un pequeño retraso para que el DOM se actualice antes de la captura
-                setTimeout(() => {
-                    html2canvas(invoiceContainer, {
-                        scale: 2,
-                        useCORS: true,
-                        scrollY: -window.scrollY
-                    }).then(canvas => {
-                        const imgData = canvas.toDataURL('image/png');
-                        const pdf = new jspdf.jsPDF({
-                            orientation: 'p',
-                            unit: 'mm',
-                            format: 'a4'
-                        });
-                        
-                        const pdfWidth = pdf.internal.pageSize.getWidth();
-                        const pdfHeight = pdf.internal.pageSize.getHeight();
-                        
-                        const imgWidth = canvas.width;
-                        const imgHeight = canvas.height;
-                        
-                        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                        const newWidth = imgWidth * ratio;
-                        const newHeight = imgHeight * ratio;
-                        
-                        const x = (pdfWidth - newWidth) / 2;
-                        const y = (pdfHeight - newHeight) / 2;
-                        
-                        pdf.addImage(imgData, 'PNG', x, y, newWidth, newHeight);
-                        pdf.save(`Factura_${document.getElementById('num-factura').value.replace(/\//g, '-')}.pdf`);
-
-                        // Restauramos la interfaz después de la exportación
-                        document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
-                        document.querySelectorAll('.input-as-text').forEach(span => span.remove());
-                        document.querySelectorAll('.input-field').forEach(input => input.style.display = '');
-                        document.getElementById('receptor-inputs').style.display = '';
-                        document.getElementById('iva-print-text').style.display = 'none';
-
-                        // Eliminar el div de visualización de datos del receptor
-                        const receptorDisplayDiv = document.querySelector('.print-only');
-                        if (receptorDisplayDiv) {
-                            receptorDisplayDiv.remove();
-                        }
+                html2canvas(invoiceContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: -window.scrollY
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jspdf.jsPDF({
+                        orientation: 'p',
+                        unit: 'mm',
+                        format: 'a4'
                     });
-                }, 500); // Pequeño retraso para asegurar el renderizado
+                    
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    
+                    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                    const newWidth = imgWidth * ratio;
+                    const newHeight = imgHeight * ratio;
+                    
+                    const x = (pdfWidth - newWidth) / 2;
+                    const y = (pdfHeight - newHeight) / 2;
+                    
+                    pdf.addImage(imgData, 'PNG', x, y, newWidth, newHeight);
+                    pdf.save(`Factura_${document.getElementById('num-factura').value.replace(/\//g, '-')}.pdf`);
+
+                    // Restauramos la interfaz después de la exportación
+                    document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+                    document.querySelectorAll('.input-as-text').forEach(span => span.remove());
+                    inputs.forEach(input => input.classList.remove('print-hidden-input'));
+                    document.getElementById('receptor-inputs').style.display = '';
+                    document.getElementById('receptor-print-info').style.display = 'none';
+                    ivaPrintText.style.display = 'none';
+                });
             }
 
             addItemBtn.addEventListener('click', addItem);
