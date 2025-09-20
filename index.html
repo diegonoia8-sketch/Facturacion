@@ -8,328 +8,531 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #F8FAFC; /* Slate-50 */
+            --bg-color: #f5f7fa;
             --sidebar-color: #ffffff;
-            --text-color: #1E293B; /* Slate-800 */
-            --text-muted: #64748B; /* Slate-500 */
-            --primary: #4F46E5; /* Indigo-600 */
-            --primary-hover: #4338CA; /* Indigo-700 */
-            --border-color: #E2E8F0; /* Slate-200 */
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border-color: #e2e8f0;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
+
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            line-height: 1.5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            min-height: 100vh;
         }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
         .invoice-paper {
             background-color: white;
-            border-radius: var(--radius);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
         }
+
+        .invoice-paper:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            transform: translateY(-2px);
+        }
+        
         .logo-placeholder {
-            background-color: var(--bg-color);
+            background-color: var(--sidebar-color);
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 12px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px dashed var(--border-color);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
+        
         .divider {
-            border-top: 2px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+            opacity: 0.5;
         }
+        
         .total-box {
-            background-color: var(--bg-color);
+            background-color: var(--sidebar-color);
             border-radius: var(--radius);
             padding: 1.5rem;
-            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
         }
-        input, select, textarea {
-            background-color: white;
+        
+        input, select {
+            background-color: var(--bg-color);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--radius);
             padding: 0.75rem;
             font-size: 0.95rem;
             transition: all 0.2s;
             width: 100%;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
         }
-        input:focus, select:focus, textarea:focus {
+        
+        input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
-        .btn {
+        
+        button {
+            transition: all 0.2s;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1.25rem;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            cursor: pointer;
+            gap: 0.5rem;
         }
-        .btn-primary {
+        
+        #generateInvoice, #exportPdf {
             background-color: var(--primary);
+            padding: 0.75rem 1.5rem;
             color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        #generateInvoice:hover, #exportPdf:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .logo-placeholder {
+            background-color: var(--sidebar-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            width: 100px;
+            height: 100px;
             box-shadow: var(--shadow);
         }
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2), 0 4px 6px -2px rgba(79, 70, 229, 0.1);
-        }
-        .btn-secondary {
-            background-color: white;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
-        .btn-secondary:hover {
-            background-color: #F1F5F9; /* Slate-100 */
-            transform: translateY(-1px);
-        }
-        .table-input {
-            width: 100%;
-            background-color: transparent;
+        
+        .remove-item {
+            background: none;
             border: none;
-            padding: 0.5rem 0.25rem;
-            box-shadow: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
         }
-        .table-input:focus {
-            border-color: transparent;
-            box-shadow: none;
+        
+        .remove-item:hover {
+            background-color: rgba(55, 53, 47, 0.08);
         }
-        .table-cell-amount {
-            font-weight: 600;
-            color: var(--primary);
+        
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        th {
+            background-color: var(--sidebar-color);
+            font-weight: 500;
+        }
+        
+        td, th {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans leading-normal tracking-normal">
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="flex flex-col lg:flex-row w-full max-w-7xl space-y-8 lg:space-y-0 lg:space-x-8">
-            <div class="lg:w-1/3 w-full bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200 sticky top-4 self-start">
-                <h2 class="text-2xl font-extrabold text-gray-900 mb-6">Datos de la Factura</h2>
-
-                <div class="space-y-6 mb-8">
-                    <div>
-                        <label for="invoiceNumber" class="block text-sm font-semibold text-gray-700 mb-2">Nº de Factura</label>
-                        <input type="text" id="invoiceNumber" class="form-input" value="INV-001">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="fecha" class="block text-sm font-semibold text-gray-700 mb-2">Fecha</label>
-                            <input type="date" id="fecha" class="form-input">
-                        </div>
-                        <div>
-                            <label for="dueDate" class="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
-                            <input type="date" id="dueDate" class="form-input">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-6 mb-8">
-                    <h3 class="text-lg font-bold text-gray-800">De</h3>
-                    <input type="text" id="fromName" class="form-input" placeholder="Nombre de la empresa">
-                    <textarea id="fromAddress" class="form-input" rows="2" placeholder="Dirección"></textarea>
-                    <input type="text" id="fromPhone" class="form-input" placeholder="Teléfono/Email">
-                </div>
-
-                <div class="space-y-6 mb-8">
-                    <h3 class="text-lg font-bold text-gray-800">Para</h3>
-                    <input type="text" id="toName" class="form-input" placeholder="Nombre del cliente">
-                    <textarea id="toAddress" class="form-input" rows="2" placeholder="Dirección"></textarea>
-                    <input type="text" id="toPhone" class="form-input" placeholder="Teléfono/Email">
-                </div>
-
-                <button id="downloadPdfBtn" class="btn btn-primary w-full flex items-center justify-center">
-                    <i data-feather="download" class="w-5 h-5 mr-2"></i>
-                    Descargar Factura
-                </button>
-            </div>
-
-            <div id="invoice" class="lg:w-2/3 w-full invoice-paper p-6 md:p-10">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
-                    <div class="mb-4 sm:mb-0">
-                        <h1 class="text-4xl font-extrabold text-gray-900 leading-tight">FACTURA</h1>
-                        <p class="text-sm text-gray-500 mt-2">Nº: <span id="displayInvoiceNumber" class="font-bold text-gray-800">INV-001</span></p>
-                    </div>
-                    <div class="text-left sm:text-right">
-                        <p class="text-sm text-gray-500">Fecha: <span id="displayFecha" class="font-semibold text-gray-700">2024-05-20</span></p>
-                        <p class="text-sm text-gray-500">Vencimiento: <span id="displayDueDate" class="font-semibold text-gray-700">2024-06-20</span></p>
-                    </div>
-                </div>
-
-                <div class="grid sm:grid-cols-2 gap-8 mb-10 text-sm">
-                    <div>
-                        <h3 class="font-bold text-gray-800 mb-3 uppercase tracking-wide">De:</h3>
-                        <p id="displayFromName" class="font-semibold">Nombre de la empresa</p>
-                        <p id="displayFromAddress" class="text-gray-600">Dirección de la empresa</p>
-                        <p id="displayFromPhone" class="text-gray-600">Teléfono/Email</p>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 mb-3 uppercase tracking-wide">Para:</h3>
-                        <p id="displayToName" class="font-semibold">Nombre del cliente</p>
-                        <p id="displayToAddress" class="text-gray-600">Dirección del cliente</p>
-                        <p id="displayToPhone" class="text-gray-600">Teléfono/Email</p>
-                    </div>
-                </div>
-
-                <table class="w-full text-left border-collapse table-auto mb-10">
-                    <thead>
-                        <tr class="text-gray-600 uppercase text-xs border-b border-gray-300">
-                            <th class="py-3 px-4 font-bold">Descripción</th>
-                            <th class="py-3 px-4 font-bold text-right">Cantidad</th>
-                            <th class="py-3 px-4 font-bold text-right">Precio</th>
-                            <th class="py-3 px-4 font-bold text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="invoiceItems">
-                        <tr class="border-b border-gray-100 bg-white">
-                            <td class="py-3 px-4 text-gray-700"><input type="text" class="table-input" value="Servicio de diseño web"></td>
-                            <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-qty" value="1"></td>
-                            <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-price" value="500"></td>
-                            <td class="py-3 px-4 text-right font-bold total-item table-cell-amount">500.00 €</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="flex justify-end mb-8">
-                    <button id="addItemBtn" class="btn btn-secondary flex items-center">
-                        <i data-feather="plus" class="w-4 h-4 mr-2"></i>
-                        Añadir Artículo
+<body>
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <h1 class="text-3xl font-bold text-var(--text-color)">Generador de Facturas</h1>
+                <div class="mt-4 md:mt-0 flex gap-4">
+                    <button id="generateInvoice" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg flex items-center">
+                        <i data-feather="file-text" class="w-5 h-5 mr-2"></i>
+                        Generar Factura
                     </button>
+                    <button id="exportPdf" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg flex items-center hidden">
+                        <i data-feather="download" class="w-5 h-5 mr-2"></i>
+                        Exportar PDF
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-var(--bg-color) border border-var(--border-color) rounded-lg p-6 mb-8">
+                <h2 class="text-lg font-medium text-var(--text-color) mb-4">Datos de la Factura</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Emisor</label>
+                        <input type="text" id="emisor" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">NIF/CIF</label>
+                        <input type="text" id="nif" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                        <input type="text" id="direccion" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                        <input type="text" id="telefono" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                        <input type="text" id="cliente" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">NIF Cliente</label>
+                        <input type="text" id="nifCliente" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección Cliente</label>
+                        <input type="text" id="direccionCliente" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                        <input type="date" id="fecha" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cuenta Bancaria</label>
+                    <input type="text" id="cuentaBancaria" placeholder="ESXX XXXX XXXX XXXX XXXX XXXX" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            
+            <div class="bg-var(--bg-color) border border-var(--border-color) rounded-lg p-6 mb-8">
+                <h2 class="text-lg font-medium text-var(--text-color) mb-4">Conceptos</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200" id="itemsTable">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IVA (%)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="itemsBody">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="text" class="w-full px-2 py-1 border border-gray-300 rounded-md descripcion">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" min="1" value="1" class="w-20 px-2 py-1 border border-gray-300 rounded-md cantidad">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" min="0" step="0.01" class="w-24 px-2 py-1 border border-gray-300 rounded-md precio">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <select class="w-20 px-2 py-1 border border-gray-300 rounded-md iva">
+                                        <option value="21">21%</option>
+                                        <option value="10">10%</option>
+                                        <option value="4">4%</option>
+                                        <option value="0">0%</option>
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap total-item">0.00 €</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <button class="text-red-500 hover:text-red-700 remove-item">
+                                        <i data-feather="trash-2" class="w-5 h-5"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4">
+                    <button id="addItem" class="flex items-center text-blue-600 hover:text-blue-800">
+                        <i data-feather="plus-circle" class="w-5 h-5 mr-1"></i>
+                        Añadir concepto
+                    </button>
+                </div>
+            </div>
+            
+            
+            <div id="invoicePreview" class="invoice-paper p-8 max-w-3xl mx-auto hidden mt-12">
+                <div class="flex justify-between mb-8 items-start">
+                    <div class="logo-placeholder w-24 h-24">
+                        <span class="text-var(--text-muted)">Logo</span>
+                    </div>
+                    <div class="text-right">
+                        <h2 class="text-xl font-semibold text-var(--text-color)">FACTURA</h2>
+                        <p class="text-var(--text-muted) mt-2">Nº: <span id="invoiceNumber" class="text-var(--text-color)">2023/01/001</span></p>
+                        <p class="text-var(--text-muted)">Fecha: <span id="invoiceDate" class="text-var(--text-color)">01/01/2023</span></p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-base font-medium text-var(--text-color) mb-2">Emisor</h3>
+                        <p id="previewEmisor" class="text-var(--text-color)">Nombre de la empresa</p>
+                        <p id="previewNif" class="text-var(--text-muted)">NIF/CIF: 12345678A</p>
+                        <p id="previewDireccion" class="text-var(--text-muted)">Dirección</p>
+                        <p id="previewTelefono" class="text-var(--text-muted)">Teléfono</p>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-medium text-var(--text-color) mb-2">Cliente</h3>
+                        <p id="previewCliente" class="text-var(--text-color)">Nombre del cliente</p>
+                        <p id="previewNifCliente" class="text-var(--text-muted)">NIF/CIF: 87654321B</p>
+                        <p id="previewDireccionCliente" class="text-var(--text-muted)">Dirección del cliente</p>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IVA</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="previewItems">
+                            <!-- Items will be added here -->
+                        </tbody>
+                    </table>
                 </div>
                 
                 <div class="flex justify-end">
-                    <div class="w-full sm:w-1/2 total-box">
-                        <div class="flex justify-between py-2 text-gray-700">
-                            <span>Subtotal:</span>
-                            <span id="subtotal" class="font-semibold text-gray-900">0.00 €</span>
+                    <div class="total-box p-4 w-64">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-var(--text-muted)">Base Imponible:</span>
+                            <span id="baseImponible" class="font-medium">0.00 €</span>
                         </div>
-                        <div class="flex justify-between py-2 text-gray-700">
-                            <span>IVA (21%):</span>
-                            <span id="tax" class="font-semibold text-gray-900">0.00 €</span>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-var(--text-muted)">IVA (21%):</span>
+                            <span id="ivaTotal" class="font-medium">0.00 €</span>
                         </div>
-                        <div class="flex justify-between py-4 mt-2 text-gray-900 border-t border-gray-300 font-extrabold">
-                            <span class="text-xl">Total:</span>
-                            <span id="total" class="text-xl text-indigo-600">0.00 €</span>
+                        <div class="divider my-2"></div>
+                        <div class="flex justify-between font-medium">
+                            <span>TOTAL:</span>
+                            <span id="totalFactura">0.00 €</span>
                         </div>
                     </div>
+                </div>
+                
+                <div class="mt-12 pt-8 border-t border-var(--border-color)">
+                    <p class="text-var(--text-muted) text-sm">Forma de pago: Transferencia bancaria</p>
+                    <p class="text-var(--text-muted) text-sm mt-1" id="previewCuentaBancaria">IBAN: ESXX XXXX XXXX XXXX XXXX XXXX</p>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
-        const invoiceItems = document.getElementById('invoiceItems');
-        const subtotalEl = document.getElementById('subtotal');
-        const taxEl = document.getElementById('tax');
-        const totalEl = document.getElementById('total');
-        const addItemBtn = document.getElementById('addItemBtn');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        
+        // Initialize feather icons
         feather.replace();
-
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('fecha').value = today;
-
-        function updateDisplay() {
-            document.getElementById('displayInvoiceNumber').innerText = document.getElementById('invoiceNumber').value;
-            document.getElementById('displayFecha').innerText = document.getElementById('fecha').value;
-            document.getElementById('displayDueDate').innerText = document.getElementById('dueDate').value;
-            document.getElementById('displayFromName').innerText = document.getElementById('fromName').value;
-            document.getElementById('displayFromAddress').innerText = document.getElementById('fromAddress').value;
-            document.getElementById('displayFromPhone').innerText = document.getElementById('fromPhone').value;
-            document.getElementById('displayToName').innerText = document.getElementById('toName').value;
-            document.getElementById('displayToAddress').innerText = document.getElementById('toAddress').value;
-            document.getElementById('displayToPhone').innerText = document.getElementById('toPhone').value;
-        }
-
-        function calculateTotals() {
-            let subtotal = 0;
-            const items = invoiceItems.querySelectorAll('tr');
-            items.forEach(item => {
-                const qtyInput = item.querySelector('.item-qty');
-                const priceInput = item.querySelector('.item-price');
-                const qty = parseFloat(qtyInput.value) || 0;
-                const price = parseFloat(priceInput.value) || 0;
-                const total = (qty * price).toFixed(2);
-                item.querySelector('.total-item').innerText = `${total} €`;
-                subtotal += parseFloat(total);
-            });
-            const taxRate = 0.21;
-            const tax = (subtotal * taxRate).toFixed(2);
-            const total = (subtotal + parseFloat(tax)).toFixed(2);
-
-            subtotalEl.innerText = `${subtotal.toFixed(2)} €`;
-            taxEl.innerText = `${tax} €`;
-            totalEl.innerText = `${total} €`;
-        }
         
-        function addListenersToItem(item) {
-            const qtyInput = item.querySelector('.item-qty');
-            const priceInput = item.querySelector('.item-price');
-            const removeBtn = item.querySelector('.remove-item-btn');
-            
-            qtyInput.addEventListener('input', calculateTotals);
-            priceInput.addEventListener('input', calculateTotals);
-            if (removeBtn) {
-                removeBtn.addEventListener('click', () => {
-                    item.remove();
-                    calculateTotals();
-                });
-            }
-        }
-
-        addItemBtn.addEventListener('click', () => {
+        // Invoice counter
+        let invoiceCounter = localStorage.getItem('invoiceCounter') || 1;
+        
+        // Add item row
+        document.getElementById('addItem').addEventListener('click', function() {
+            const tbody = document.getElementById('itemsBody');
             const newRow = document.createElement('tr');
-            newRow.classList.add('border-b', 'border-gray-100', 'bg-white');
             newRow.innerHTML = `
-                <td class="py-3 px-4 text-gray-700"><input type="text" class="table-input" placeholder="Descripción"></td>
-                <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-qty" value="1"></td>
-                <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-price" value="0"></td>
-                <td class="py-3 px-4 text-right font-bold total-item table-cell-amount">0.00 €</td>
-                <td class="py-3 px-4 text-right">
-                    <button class="text-red-500 hover:text-red-700 remove-item-btn">
-                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="text" class="w-full px-2 py-1 border border-gray-300 rounded-md descripcion">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="number" min="1" value="1" class="w-20 px-2 py-1 border border-gray-300 rounded-md cantidad">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="number" min="0" step="0.01" class="w-24 px-2 py-1 border border-gray-300 rounded-md precio">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <select class="w-20 px-2 py-1 border border-gray-300 rounded-md iva">
+                        <option value="21">21%</option>
+                        <option value="10">10%</option>
+                        <option value="4">4%</option>
+                        <option value="0">0%</option>
+                    </select>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap total-item">0.00 €</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <button class="text-red-500 hover:text-red-700 remove-item">
+                        <i data-feather="trash-2" class="w-5 h-5"></i>
                     </button>
                 </td>
             `;
-            invoiceItems.appendChild(newRow);
+            tbody.appendChild(newRow);
             feather.replace();
-            addListenersToItem(newRow);
-            calculateTotals();
+            
+            // Add event listeners to new row
+            addItemEventListeners(newRow);
         });
-
-        document.querySelectorAll('input, textarea').forEach(input => {
-            input.addEventListener('input', () => {
-                updateDisplay();
+        
+        // Remove item row
+        function addItemEventListeners(row) {
+            const inputs = row.querySelectorAll('.cantidad, .precio, .iva, .descripcion');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateRowTotal);
+            });
+            
+            row.querySelector('.remove-item').addEventListener('click', function() {
+                row.remove();
                 calculateTotals();
             });
+        }
+        
+        // Calculate row total
+        function calculateRowTotal() {
+            const row = this.closest('tr');
+            const cantidad = parseFloat(row.querySelector('.cantidad').value) || 0;
+            const precio = parseFloat(row.querySelector('.precio').value) || 0;
+            const iva = parseFloat(row.querySelector('.iva').value) || 0;
+            
+            const subtotal = cantidad * precio;
+            const total = subtotal * (1 + iva / 100);
+            
+            row.querySelector('.total-item').textContent = total.toFixed(2) + ' €';
+            calculateTotals();
+        }
+        
+        // Calculate all totals
+        function calculateTotals() {
+            const rows = document.querySelectorAll('#itemsBody tr');
+            let baseImponible = 0;
+            let ivaTotal = 0;
+            let totalFactura = 0;
+            
+            rows.forEach(row => {
+                const cantidad = parseFloat(row.querySelector('.cantidad').value) || 0;
+                const precio = parseFloat(row.querySelector('.precio').value) || 0;
+                const iva = parseFloat(row.querySelector('.iva').value) || 0;
+                
+                const subtotal = cantidad * precio;
+                const total = subtotal * (1 + iva / 100);
+                
+                baseImponible += subtotal;
+                ivaTotal += subtotal * (iva / 100);
+                totalFactura += total;
+            });
+            
+            // Update preview totals if visible
+            if (!document.getElementById('invoicePreview').classList.contains('hidden')) {
+                document.getElementById('baseImponible').textContent = baseImponible.toFixed(2) + ' €';
+                document.getElementById('ivaTotal').textContent = ivaTotal.toFixed(2) + ' €';
+                document.getElementById('totalFactura').textContent = totalFactura.toFixed(2) + ' €';
+            }
+        }
+        
+        // Generate invoice
+        document.getElementById('generateInvoice').addEventListener('click', function() {
+            // Get current date
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            
+            // Format invoice number
+            const invoiceNumber = `${year}/${month}/${String(invoiceCounter).padStart(3, '0')}`;
+            
+            // Update invoice counter in localStorage
+            invoiceCounter++;
+            localStorage.setItem('invoiceCounter', invoiceCounter);
+            
+            // Set invoice number and date
+            document.getElementById('invoiceNumber').textContent = invoiceNumber;
+            
+            const fechaInput = document.getElementById('fecha').value;
+            const invoiceDate = fechaInput ? new Date(fechaInput).toLocaleDateString('es-ES') : today.toLocaleDateString('es-ES');
+            document.getElementById('invoiceDate').textContent = invoiceDate;
+            
+            // Set emitter and client data
+            document.getElementById('previewEmisor').textContent = document.getElementById('emisor').value;
+            document.getElementById('previewNif').textContent = 'NIF/CIF: ' + document.getElementById('nif').value;
+            document.getElementById('previewDireccion').textContent = document.getElementById('direccion').value;
+            document.getElementById('previewTelefono').textContent = document.getElementById('telefono').value;
+            
+            document.getElementById('previewCliente').textContent = document.getElementById('cliente').value;
+            document.getElementById('previewNifCliente').textContent = 'NIF/CIF: ' + document.getElementById('nifCliente').value;
+            document.getElementById('previewDireccionCliente').textContent = document.getElementById('direccionCliente').value;
+            document.getElementById('previewCuentaBancaria').textContent = 'IBAN: ' + (document.getElementById('cuentaBancaria').value || 'ESXX XXXX XXXX XXXX XXXX XXXX');
+            
+            // Add items to preview
+            const previewItems = document.getElementById('previewItems');
+            previewItems.innerHTML = '';
+            
+            const rows = document.querySelectorAll('#itemsBody tr');
+            let baseImponible = 0;
+            let ivaTotal = 0;
+            let totalFactura = 0;
+            
+            rows.forEach(row => {
+                const descripcion = row.querySelector('.descripcion').value;
+                const cantidad = parseFloat(row.querySelector('.cantidad').value) || 0;
+                const precio = parseFloat(row.querySelector('.precio').value) || 0;
+                const iva = parseFloat(row.querySelector('.iva').value) || 0;
+                
+                const subtotal = cantidad * precio;
+                const total = subtotal * (1 + iva / 100);
+                
+                baseImponible += subtotal;
+                ivaTotal += subtotal * (iva / 100);
+                totalFactura += total;
+                
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${descripcion}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${cantidad}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${precio.toFixed(2)} €</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${iva}%</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${total.toFixed(2)} €</td>
+                `;
+                previewItems.appendChild(newRow);
+            });
+            
+            // Update totals
+            document.getElementById('baseImponible').textContent = baseImponible.toFixed(2) + ' €';
+            document.getElementById('ivaTotal').textContent = ivaTotal.toFixed(2) + ' €';
+            document.getElementById('totalFactura').textContent = totalFactura.toFixed(2) + ' €';
+            
+            // Show preview and export button
+            document.getElementById('invoicePreview').classList.remove('hidden');
+            document.getElementById('exportPdf').classList.remove('hidden');
+            
+            // Scroll to preview
+            document.getElementById('invoicePreview').scrollIntoView({ behavior: 'smooth' });
         });
         
-        document.querySelectorAll('.item-qty, .item-price').forEach(item => {
-            addListenersToItem(item.closest('tr'));
-        });
-
-        updateDisplay();
-        calculateTotals();
-        
-        downloadPdfBtn.addEventListener('click', () => {
-            const invoice = document.getElementById('invoice');
-            html2canvas(invoice, { scale: 2 }).then(canvas => {
+        // Export to PDF
+        document.getElementById('exportPdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('invoicePreview');
+            
+            html2canvas(element).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgWidth = 210;
-                const pageHeight = 297;
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
                 const imgHeight = canvas.height * imgWidth / canvas.width;
                 let heightLeft = imgHeight;
                 let position = 0;
@@ -343,9 +546,21 @@
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
-                pdf.save('factura.pdf');
+                
+                // Get invoice number for filename
+                const invoiceNumber = document.getElementById('invoiceNumber').textContent.replace(/\//g, '-');
+                pdf.save(`factura-${invoiceNumber}.pdf`);
             });
         });
+        
+        // Add event listeners to initial row
+        document.querySelectorAll('#itemsBody tr').forEach(row => {
+            addItemEventListeners(row);
+        });
+        
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha').value = today;
     </script>
 </body>
 </html>
