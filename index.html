@@ -8,93 +8,122 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #F8FAFC; /* Slate-50 */
+            --bg-color: #f5f7fa;
             --sidebar-color: #ffffff;
-            --text-color: #1E293B; /* Slate-800 */
-            --text-muted: #64748B; /* Slate-500 */
-            --primary: #4F46E5; /* Indigo-600 */
-            --primary-hover: #4338CA; /* Indigo-700 */
-            --border-color: #E2E8F0; /* Slate-200 */
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border-color: #e2e8f0;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
+
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            line-height: 1.5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            min-height: 100vh;
         }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
         .invoice-paper {
             background-color: white;
-            border-radius: var(--radius);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
         }
+
+        .invoice-paper:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            transform: translateY(-2px);
+        }
+
         .logo-placeholder {
-            background-color: var(--bg-color);
+            background-color: var(--sidebar-color);
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 12px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px dashed var(--border-color);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
+
         .divider {
-            border-top: 2px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+            opacity: 0.5;
         }
+
         .total-box {
-            background-color: var(--bg-color);
+            background-color: var(--sidebar-color);
             border-radius: var(--radius);
             padding: 1.5rem;
-            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
         }
-        input, select, textarea {
-            background-color: white;
+
+        input, select {
+            background-color: var(--bg-color);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--radius);
             padding: 0.75rem;
             font-size: 0.95rem;
             transition: all 0.2s;
             width: 100%;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
         }
-        input:focus, select:focus, textarea:focus {
+
+        input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 0 0 3px var(--primary-hover);
         }
+
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0.75rem 1.25rem;
-            border-radius: 10px;
+            border-radius: var(--radius);
             font-weight: 600;
             transition: all 0.2s ease;
             cursor: pointer;
         }
+
         .btn-primary {
             background-color: var(--primary);
             color: white;
-            box-shadow: var(--shadow);
         }
+
         .btn-primary:hover {
             background-color: var(--primary-hover);
             transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2), 0 4px 6px -2px rgba(79, 70, 229, 0.1);
         }
+
         .btn-secondary {
-            background-color: white;
+            background-color: var(--bg-color);
             color: var(--text-color);
             border: 1px solid var(--border-color);
         }
+
         .btn-secondary:hover {
-            background-color: #F1F5F9; /* Slate-100 */
+            background-color: #e9ecef;
             transform: translateY(-1px);
         }
+
         .table-input {
             width: 100%;
             background-color: transparent;
@@ -102,50 +131,52 @@
             padding: 0.5rem 0.25rem;
             box-shadow: none;
         }
+
         .table-input:focus {
             border-color: transparent;
             box-shadow: none;
         }
-        .table-cell-amount {
-            font-weight: 600;
-            color: var(--primary);
+
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
+
     </style>
 </head>
-<body class="bg-gray-50 font-sans leading-normal tracking-normal">
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
     <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="flex flex-col lg:flex-row w-full max-w-7xl space-y-8 lg:space-y-0 lg:space-x-8">
-            <div class="lg:w-1/3 w-full bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200 sticky top-4 self-start">
-                <h2 class="text-2xl font-extrabold text-gray-900 mb-6">Generador de Facturas</h2>
+        <div class="flex flex-col md:flex-row w-full max-w-6xl space-y-8 md:space-y-0 md:space-x-8">
+            <div class="md:w-1/3 w-full bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Datos de la Factura</h2>
 
-                <div class="space-y-6 mb-8">
+                <div class="space-y-4 mb-6">
                     <div>
-                        <label for="invoiceNumber" class="block text-sm font-semibold text-gray-700 mb-2">Nº de Factura</label>
-                        <input type="text" id="invoiceNumber" placeholder="INV-001" class="form-input">
+                        <label for="invoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Nº de Factura</label>
+                        <input type="text" id="invoiceNumber" class="form-input" value="INV-001">
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="fecha" class="block text-sm font-semibold text-gray-700 mb-2">Fecha</label>
-                            <input type="date" id="fecha" class="form-input">
-                        </div>
-                        <div>
-                            <label for="dueDate" class="block text-sm font-semibold text-gray-700 mb-2">Fecha de Vencimiento</label>
-                            <input type="date" id="dueDate" class="form-input">
-                        </div>
+                    <div>
+                        <label for="fecha" class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                        <input type="date" id="fecha" class="form-input">
+                    </div>
+                    <div>
+                        <label for="dueDate" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Vencimiento</label>
+                        <input type="date" id="dueDate" class="form-input">
                     </div>
                 </div>
 
-                <div class="space-y-6 mb-8">
-                    <h3 class="text-lg font-bold text-gray-800">Datos de la Empresa</h3>
+                <div class="space-y-4 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">De</h3>
                     <input type="text" id="fromName" class="form-input" placeholder="Nombre de la empresa">
-                    <textarea id="fromAddress" class="form-input" rows="2" placeholder="Dirección"></textarea>
+                    <input type="text" id="fromAddress" class="form-input" placeholder="Dirección">
                     <input type="text" id="fromPhone" class="form-input" placeholder="Teléfono/Email">
                 </div>
 
-                <div class="space-y-6 mb-8">
-                    <h3 class="text-lg font-bold text-gray-800">Datos del Cliente</h3>
+                <div class="space-y-4 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">Para</h3>
                     <input type="text" id="toName" class="form-input" placeholder="Nombre del cliente">
-                    <textarea id="toAddress" class="form-input" rows="2" placeholder="Dirección"></textarea>
+                    <input type="text" id="toAddress" class="form-input" placeholder="Dirección">
                     <input type="text" id="toPhone" class="form-input" placeholder="Teléfono/Email">
                 </div>
 
@@ -155,51 +186,51 @@
                 </button>
             </div>
 
-            <div id="invoice" class="lg:w-2/3 w-full invoice-paper p-6 md:p-10">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
-                    <div class="mb-4 sm:mb-0">
-                        <h1 class="text-4xl font-extrabold text-gray-900 leading-tight">FACTURA</h1>
-                        <p class="text-sm text-gray-500 mt-2">Nº: <span id="displayInvoiceNumber" class="font-bold text-gray-800">INV-001</span></p>
+            <div id="invoice" class="md:w-2/3 w-full invoice-paper p-6 md:p-10">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+                    <div class="logo-placeholder w-24 h-24 mb-4 sm:mb-0">
+                        <span class="text-gray-400">Logo</span>
                     </div>
-                    <div class="text-left sm:text-right">
-                        <div class="logo-placeholder w-24 h-24 sm:w-32 sm:h-32 mb-4">
-                            <span class="text-gray-400 text-sm">Logo</span>
-                        </div>
+                    <div class="text-right">
+                        <h1 class="text-4xl font-bold text-gray-800">FACTURA</h1>
+                        <p class="text-sm text-gray-500 mt-2">Nº: <span id="displayInvoiceNumber" class="font-semibold text-gray-700">INV-001</span></p>
                         <p class="text-sm text-gray-500">Fecha: <span id="displayFecha" class="font-semibold text-gray-700">2024-05-20</span></p>
-                        <p class="text-sm text-gray-500">Vencimiento: <span id="displayDueDate" class="font-semibold text-gray-700">2024-06-20</span></p>
+                        <p class="text-sm text-gray-500">Fecha de Vencimiento: <span id="displayDueDate" class="font-semibold text-gray-700">2024-06-20</span></p>
                     </div>
                 </div>
 
-                <div class="grid sm:grid-cols-2 gap-8 mb-10 text-sm">
+                <div class="flex flex-col sm:flex-row justify-between mb-8 text-sm">
                     <div>
-                        <h3 class="font-bold text-gray-800 mb-3 uppercase tracking-wide">De:</h3>
-                        <p id="displayFromName" class="font-semibold">Nombre de la empresa</p>
-                        <p id="displayFromAddress" class="text-gray-600">Dirección de la empresa</p>
-                        <p id="displayFromPhone" class="text-gray-600">Teléfono/Email</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">De:</h3>
+                        <p id="displayFromName">Nombre de la empresa</p>
+                        <p id="displayFromAddress">Dirección de la empresa</p>
+                        <p id="displayFromPhone">Teléfono/Email</p>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 mb-3 uppercase tracking-wide">Para:</h3>
-                        <p id="displayToName" class="font-semibold">Nombre del cliente</p>
-                        <p id="displayToAddress" class="text-gray-600">Dirección del cliente</p>
-                        <p id="displayToPhone" class="text-gray-600">Teléfono/Email</p>
+                    <div class="mt-6 sm:mt-0 text-left sm:text-right">
+                        <h3 class="font-semibold text-gray-800 mb-2">Para:</h3>
+                        <p id="displayToName">Nombre del cliente</p>
+                        <p id="displayToAddress">Dirección del cliente</p>
+                        <p id="displayToPhone">Teléfono/Email</p>
                     </div>
                 </div>
 
-                <table class="w-full text-left border-collapse table-auto mb-10">
+                <div class="divider mb-8"></div>
+
+                <table class="w-full text-left border-collapse table-auto mb-8">
                     <thead>
-                        <tr class="text-gray-600 uppercase text-xs border-b border-gray-300">
-                            <th class="py-3 px-4 font-bold">Descripción</th>
-                            <th class="py-3 px-4 font-bold text-right">Cantidad</th>
-                            <th class="py-3 px-4 font-bold text-right">Precio</th>
-                            <th class="py-3 px-4 font-bold text-right">Total</th>
+                        <tr class="text-gray-600 uppercase text-xs">
+                            <th class="py-2 px-4 font-semibold">Descripción</th>
+                            <th class="py-2 px-4 font-semibold text-right">Cantidad</th>
+                            <th class="py-2 px-4 font-semibold text-right">Precio</th>
+                            <th class="py-2 px-4 font-semibold text-right">Total</th>
                         </tr>
                     </thead>
                     <tbody id="invoiceItems">
-                        <tr class="border-b border-gray-100 bg-white">
+                        <tr class="border-t border-gray-200">
                             <td class="py-3 px-4 text-gray-700"><input type="text" class="table-input" value="Servicio de diseño web"></td>
                             <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-qty" value="1"></td>
                             <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-price" value="500"></td>
-                            <td class="py-3 px-4 text-right font-bold total-item table-cell-amount">500.00 €</td>
+                            <td class="py-3 px-4 text-right text-gray-700 font-medium total-item">500.00 €</td>
                         </tr>
                     </tbody>
                 </table>
@@ -211,19 +242,22 @@
                     </button>
                 </div>
                 
+
+                <div class="divider mb-8"></div>
+
                 <div class="flex justify-end">
-                    <div class="w-full sm:w-1/2 total-box">
+                    <div class="w-full sm:w-1/2">
                         <div class="flex justify-between py-2 text-gray-700">
                             <span>Subtotal:</span>
-                            <span id="subtotal" class="font-semibold text-gray-900">0.00 €</span>
+                            <span id="subtotal" class="font-semibold">0.00 €</span>
                         </div>
                         <div class="flex justify-between py-2 text-gray-700">
                             <span>IVA (21%):</span>
-                            <span id="tax" class="font-semibold text-gray-900">0.00 €</span>
+                            <span id="tax" class="font-semibold">0.00 €</span>
                         </div>
-                        <div class="flex justify-between py-4 mt-2 text-gray-900 border-t border-gray-300 font-extrabold">
-                            <span class="text-xl">Total:</span>
-                            <span id="total" class="text-xl text-indigo-600">0.00 €</span>
+                        <div class="flex justify-between py-2 mt-4 text-gray-900 border-t border-gray-200 font-bold">
+                            <span class="text-lg">Total:</span>
+                            <span id="total" class="text-lg">0.00 €</span>
                         </div>
                     </div>
                 </div>
@@ -231,6 +265,7 @@
         </div>
     </div>
     <script>
+        const invoiceForm = document.getElementById('invoiceForm');
         const invoiceItems = document.getElementById('invoiceItems');
         const subtotalEl = document.getElementById('subtotal');
         const taxEl = document.getElementById('tax');
@@ -240,35 +275,33 @@
         
         feather.replace();
 
+        // Set default date to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('fecha').value = today;
 
         function updateDisplay() {
-            document.getElementById('displayInvoiceNumber').innerText = document.getElementById('invoiceNumber').value || 'INV-001';
-            document.getElementById('displayFecha').innerText = document.getElementById('fecha').value || 'Fecha';
-            document.getElementById('displayDueDate').innerText = document.getElementById('dueDate').value || 'Fecha de Vencimiento';
-            document.getElementById('displayFromName').innerText = document.getElementById('fromName').value || 'Nombre de la empresa';
-            document.getElementById('displayFromAddress').innerText = document.getElementById('fromAddress').value || 'Dirección de la empresa';
-            document.getElementById('displayFromPhone').innerText = document.getElementById('fromPhone').value || 'Teléfono/Email';
-            document.getElementById('displayToName').innerText = document.getElementById('toName').value || 'Nombre del cliente';
-            document.getElementById('displayToAddress').innerText = document.getElementById('toAddress').value || 'Dirección del cliente';
-            document.getElementById('displayToPhone').innerText = document.getElementById('toPhone').value || 'Teléfono/Email';
+            document.getElementById('displayInvoiceNumber').innerText = document.getElementById('invoiceNumber').value;
+            document.getElementById('displayFecha').innerText = document.getElementById('fecha').value;
+            document.getElementById('displayDueDate').innerText = document.getElementById('dueDate').value;
+            document.getElementById('displayFromName').innerText = document.getElementById('fromName').value;
+            document.getElementById('displayFromAddress').innerText = document.getElementById('fromAddress').value;
+            document.getElementById('displayFromPhone').innerText = document.getElementById('fromPhone').value;
+            document.getElementById('displayToName').innerText = document.getElementById('toName').value;
+            document.getElementById('displayToAddress').innerText = document.getElementById('toAddress').value;
+            document.getElementById('displayToPhone').innerText = document.getElementById('toPhone').value;
         }
 
         function calculateTotals() {
             let subtotal = 0;
             const items = invoiceItems.querySelectorAll('tr');
             items.forEach(item => {
-                const qtyInput = item.querySelector('.item-qty');
-                const priceInput = item.querySelector('.item-price');
-                const qty = parseFloat(qtyInput.value) || 0;
-                const price = parseFloat(priceInput.value) || 0;
+                const qty = item.querySelector('.item-qty').value;
+                const price = item.querySelector('.item-price').value;
                 const total = (qty * price).toFixed(2);
                 item.querySelector('.total-item').innerText = `${total} €`;
                 subtotal += parseFloat(total);
             });
-            const taxRate = 0.21;
-            const tax = (subtotal * taxRate).toFixed(2);
+            const tax = (subtotal * 0.21).toFixed(2); // 21% IVA
             const total = (subtotal + parseFloat(tax)).toFixed(2);
 
             subtotalEl.innerText = `${subtotal.toFixed(2)} €`;
@@ -293,12 +326,12 @@
 
         addItemBtn.addEventListener('click', () => {
             const newRow = document.createElement('tr');
-            newRow.classList.add('border-b', 'border-gray-100', 'bg-white');
+            newRow.classList.add('border-t', 'border-gray-200');
             newRow.innerHTML = `
                 <td class="py-3 px-4 text-gray-700"><input type="text" class="table-input" placeholder="Descripción"></td>
                 <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-qty" value="1"></td>
                 <td class="py-3 px-4 text-right text-gray-700"><input type="number" class="table-input item-price" value="0"></td>
-                <td class="py-3 px-4 text-right font-bold total-item table-cell-amount">0.00 €</td>
+                <td class="py-3 px-4 text-right text-gray-700 font-medium total-item">0.00 €</td>
                 <td class="py-3 px-4 text-right">
                     <button class="text-red-500 hover:text-red-700 remove-item-btn">
                         <i data-feather="trash-2" class="w-4 h-4"></i>
@@ -311,7 +344,8 @@
             calculateTotals();
         });
 
-        document.querySelectorAll('input, textarea').forEach(input => {
+        // Initial setup and event listeners
+        document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => {
                 updateDisplay();
                 calculateTotals();
