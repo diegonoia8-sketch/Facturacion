@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Facturas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f7fa;
+            --sidebar-color: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border-color: #e2e8f0;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            min-height: 100vh;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
+        .invoice-paper {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .invoice-paper:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            transform: translateY(-2px);
+        }
+        
+        .logo-placeholder {
+            background-color: var(--sidebar-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .divider {
+            border-top: 1px solid var(--border-color);
+            opacity: 0.5;
+        }
+        
+        .total-box {
+            background-color: var(--sidebar-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        
+        input, select {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        
+        button {
+            transition: all 0.2s;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        #generateInvoice, #exportPdf {
+            background-color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        #generateInvoice:hover, #exportPdf:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .logo-placeholder {
+            background-color: var(--sidebar-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            width: 100px;
+            height: 100px;
+            box-shadow: var(--shadow);
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        
+        .remove-item:hover {
+            background-color: rgba(55, 53, 47, 0.08);
+        }
+        
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        th {
+            background-color: var(--sidebar-color);
+            font-weight: 500;
+        }
+        
+        td, th {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <h1 class="text-3xl font-bold text-var(--text-color)">Generador de Facturas</h1>
+                <div class="mt-4 md:mt-0 flex gap-4">
+                    <button id="generateInvoice" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg flex items-center">
+                        <i data-feather="file-text" class="w-5 h-5 mr-2"></i>
+                        Generar Factura
+                    </button>
+                    <button id="exportPdf" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg flex items-center hidden">
+                        <i data-feather="download" class="w-5 h-5 mr-2"></i>
+                        Exportar PDF
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-var(--bg-color) border border-var(--border-color) rounded-lg p-6 mb-8">
+                <h2 class="text-lg font-medium text-var(--text-color) mb-4">Datos de la Factura</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Emisor</label>
+                        <input type="text" id="emisor" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">NIF/CIF</label>
+                        <input type="text" id="nif" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                        <input type="text" id="direccion" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                        <input type="text" id="telefono" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                        <input type="text" id="cliente" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">NIF Cliente</label>
+                        <input type="text" id="nifCliente" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección Cliente</label>
+                        <input type="text" id="direccionCliente" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                        <input type="date" id="fecha" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cuenta Bancaria</label>
+                    <input type="text" id="cuentaBancaria" placeholder="ESXX XXXX XXXX XXXX XXXX XXXX" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            
+            <div class="bg-var(--bg-color) border border-var(--border-color) rounded-lg p-6 mb-8">
+                <h2 class="text-lg font-medium text-var(--text-color) mb-4">Conceptos</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200" id="itemsTable">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IVA (%)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="itemsBody">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="text" class="w-full px-2 py-1 border border-gray-300 rounded-md descripcion">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" min="1" value="1" class="w-20 px-2 py-1 border border-gray-300 rounded-md cantidad">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" min="0" step="0.01" class="w-24 px-2 py-1 border border-gray-300 rounded-md precio">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <select class="w-20 px-2 py-1 border border-gray-300 rounded-md iva">
+                                        <option value="21">21%</option>
+                                        <option value="10">10%</option>
+                                        <option value="4">4%</option>
+                                        <option value="0">0%</option>
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap total-item">0.00 €</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <button class="text-red-500 hover:text-red-700 remove-item">
+                                        <i data-feather="trash-2" class="w-5 h-5"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4">
+                    <button id="addItem" class="flex items-center text-blue-600 hover:text-blue-800">
+                        <i data-feather="plus-circle" class="w-5 h-5 mr-1"></i>
+                        Añadir concepto
+                    </button>
+                </div>
+            </div>
+            
+            
+            <div id="invoicePreview" class="invoice-paper p-8 max-w-3xl mx-auto hidden mt-12">
+                <div class="flex justify-between mb-8 items-start">
+                    <div class="logo-placeholder w-24 h-24">
+                        <span class="text-var(--text-muted)">Logo</span>
+                    </div>
+                    <div class="text-right">
+                        <h2 class="text-xl font-semibold text-var(--text-color)">FACTURA</h2>
+                        <p class="text-var(--text-muted) mt-2">Nº: <span id="invoiceNumber" class="text-var(--text-color)">2023/01/001</span></p>
+                        <p class="text-var(--text-muted)">Fecha: <span id="invoiceDate" class="text-var(--text-color)">01/01/2023</span></p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-base font-medium text-var(--text-color) mb-2">Emisor</h3>
+                        <p id="previewEmisor" class="text-var(--text-color)">Nombre de la empresa</p>
+                        <p id="previewNif" class="text-var(--text-muted)">NIF/CIF: 12345678A</p>
+                        <p id="previewDireccion" class="text-var(--text-muted)">Dirección</p>
+                        <p id="previewTelefono" class="text-var(--text-muted)">Teléfono</p>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-medium text-var(--text-color) mb-2">Cliente</h3>
+                        <p id="previewCliente" class="text-var(--text-color)">Nombre del cliente</p>
+                        <p id="previewNifCliente" class="text-var(--text-muted)">NIF/CIF: 87654321B</p>
+                        <p id="previewDireccionCliente" class="text-var(--text-muted)">Dirección del cliente</p>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IVA</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="previewItems">
+                            <!-- Items will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="flex justify-end">
+                    <div class="total-box p-4 w-64">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-var(--text-muted)">Base Imponible:</span>
+                            <span id="baseImponible" class="font-medium">0.00 €</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-var(--text-muted)">IVA (21%):</span>
+                            <span id="ivaTotal" class="font-medium">0.00 €</span>
+                        </div>
+                        <div class="divider my-2"></div>
+                        <div class="flex justify-between font-medium">
+                            <span>TOTAL:</span>
+                            <span id="totalFactura">0.00 €</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 pt-8 border-t border-var(--border-color)">
+                    <p class="text-var(--text-muted) text-sm">Forma de pago: Transferencia bancaria</p>
+                    <p class="text-var(--text-muted) text-sm mt-1" id="previewCuentaBancaria">IBAN: ESXX XXXX XXXX XXXX XXXX XXXX</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize feather icons
+        feather.replace();
+        
+        // Invoice counter
+        let invoiceCounter = localStorage.getItem('invoiceCounter') || 1;
+        
+        // Add item row
+        document.getElementById('addItem').addEventListener('click', function() {
+            const tbody = document.getElementById('itemsBody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="text" class="w-full px-2 py-1 border border-gray-300 rounded-md descripcion">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="number" min="1" value="1" class="w-20 px-2 py-1 border border-gray-300 rounded-md cantidad">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="number" min="0" step="0.01" class="w-24 px-2 py-1 border border-gray-300 rounded-md precio">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <select class="w-20 px-2 py-1 border border-gray-300 rounded-md iva">
+                        <option value="21">21%</option>
+                        <option value="10">10%</option>
+                        <option value="4">4%</option>
+                        <option value="0">0%</option>
+                    </select>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap total-item">0.00 €</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <button class="text-red-500 hover:text-red-700 remove-item">
+                        <i data-feather="trash-2" class="w-5 h-5"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(newRow);
+            feather.replace();
+            
+            // Add event listeners to new row
+            addItemEventListeners(newRow);
+        });
+        
+        // Remove item row
+        function addItemEventListeners(row) {
+            const inputs = row.querySelectorAll('.cantidad, .precio, .iva, .descripcion');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateRowTotal);
+            });
+            
+            row.querySelector('.remove-item').addEventListener('click', function() {
+                row.remove();
+                calculateTotals();
+            });
+        }
+        
+        // Calculate row total
+        function calculateRowTotal() {
+            const row = this.closest('tr');
+            const cantidad = parseFloat(row.querySelector('.cantidad').value) || 0;
+            const precio = parseFloat(row.querySelector('.precio').value) || 0;
+            const iva = parseFloat(row.querySelector('.iva').value) || 0;
+            
+            const subtotal = cantidad * precio;
+            const total = subtotal * (1 + iva / 100);
+            
+            row.querySelector('.total-item').textContent = total.toFixed(2) + ' €';
+            calculateTotals();
+        }
+        
+        // Calculate all totals
+        function calculateTotals() {
+            const rows = document.querySelectorAll('#itemsBody tr');
+            let baseImponible = 0;
+            let ivaTotal = 0;
+            let totalFactura = 0;
+            
+            rows.forEach(row => {
+                const cantidad = parseFloat(row.querySelector('.cantidad').value) || 0;
+                const precio = parseFloat(row.querySelector('.precio').value) || 0;
+                const iva = parseFloat(row.querySelector('.iva').value) || 0;
+                
+                const subtotal = cantidad * precio;
+                const total = subtotal * (1 + iva / 100);
+                
+                baseImponible += subtotal;
+                ivaTotal += subtotal * (iva / 100);
+                totalFactura += total;
+            });
+            
+            // Update preview totals if visible
+            if (!document.getElementById('invoicePreview').classList.contains('hidden')) {
+                document.getElementById('baseImponible').textContent = baseImponible.toFixed(2) + ' €';
+                document.getElementById('ivaTotal').textContent = ivaTotal.toFixed(2) + ' €';
+                document.getElementById('totalFactura').textContent = totalFactura.toFixed(2) + ' €';
+            }
+        }
+        
+        // Generate invoice
+        document.getElementById('generateInvoice').addEventListener('click', function() {
+            // Get current date
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            
+            // Format invoice number
+            const invoiceNumber = `${year}/${month}/${String(invoiceCounter).padStart(3, '0')}`;
+            
+            // Update invoice counter in localStorage
+            invoiceCounter++;
+            localStorage.setItem('invoiceCounter', invoiceCounter);
+            
+            // Set invoice number and date
+            document.getElementById('invoiceNumber').textContent = invoiceNumber;
+            
+            const fechaInput = document.getElementById('fecha').value;
+            const invoiceDate = fechaInput ? new Date(fechaInput).toLocaleDateString('es-ES') : today.toLocaleDateString('es-ES');
+            document.getElementById('invoiceDate').textContent = invoiceDate;
+            
+            // Set emitter and client data
+            document.getElementById('previewEmisor').textContent = document.getElementById('emisor').value;
+            document.getElementById('previewNif').textContent = 'NIF/CIF: ' + document.getElementById('nif').value;
+            document.getElementById('previewDireccion').textContent = document.getElementById('direccion').value;
+            document.getElementById('previewTelefono').textContent = document.getElementById('telefono').value;
+            
+            document.getElementById('previewCliente').textContent = document.getElementById('cliente').value;
+            document.getElementById('previewNifCliente').textContent = 'NIF/CIF: ' + document.getElementById('nifCliente').value;
+            document.getElementById('previewDireccionCliente').textContent = document.getElementById('direccionCliente').value;
+            document.getElementById('previewCuentaBancaria').textContent = 'IBAN: ' + (document.getElementById('cuentaBancaria').value || 'ESXX XXXX XXXX XXXX XXXX XXXX');
+            
+            // Add items to preview
+            const previewItems = document.getElementById('previewItems');
+            previewItems.innerHTML = '';
+            
+            const rows = document.querySelectorAll('#itemsBody tr');
+            let baseImponible = 0;
+            let ivaTotal = 0;
+            let totalFactura = 0;
+            
+            rows.forEach(row => {
+                const descripcion = row.querySelector('.descripcion').value;
+                const cantidad = parseFloat(row.querySelector('.cantidad').value) || 0;
+                const precio = parseFloat(row.querySelector('.precio').value) || 0;
+                const iva = parseFloat(row.querySelector('.iva').value) || 0;
+                
+                const subtotal = cantidad * precio;
+                const total = subtotal * (1 + iva / 100);
+                
+                baseImponible += subtotal;
+                ivaTotal += subtotal * (iva / 100);
+                totalFactura += total;
+                
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${descripcion}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${cantidad}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${precio.toFixed(2)} €</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${iva}%</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${total.toFixed(2)} €</td>
+                `;
+                previewItems.appendChild(newRow);
+            });
+            
+            // Update totals
+            document.getElementById('baseImponible').textContent = baseImponible.toFixed(2) + ' €';
+            document.getElementById('ivaTotal').textContent = ivaTotal.toFixed(2) + ' €';
+            document.getElementById('totalFactura').textContent = totalFactura.toFixed(2) + ' €';
+            
+            // Show preview and export button
+            document.getElementById('invoicePreview').classList.remove('hidden');
+            document.getElementById('exportPdf').classList.remove('hidden');
+            
+            // Scroll to preview
+            document.getElementById('invoicePreview').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Export to PDF
+        document.getElementById('exportPdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('invoicePreview');
+            
+            html2canvas(element).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Get invoice number for filename
+                const invoiceNumber = document.getElementById('invoiceNumber').textContent.replace(/\//g, '-');
+                pdf.save(`factura-${invoiceNumber}.pdf`);
+            });
+        });
+        
+        // Add event listeners to initial row
+        document.querySelectorAll('#itemsBody tr').forEach(row => {
+            addItemEventListeners(row);
+        });
+        
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha').value = today;
+    </script>
+</body>
+</html>
