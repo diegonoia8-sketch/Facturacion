@@ -8,16 +8,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f0f4f8;
+            --bg-color: #f8fafc;
             --invoice-bg: #ffffff;
-            --text-color: #334155;
-            --primary-color: #3b82f6;
-            --accent-color: #60a5fa;
-            --border-color: #e2e8f0;
-            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --text-color: #1f2937;
+            --primary-color: #2563eb;
+            --accent-color: #3b82f6;
+            --border-color: #e5e7eb;
+            --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.05);
             --shadow-medium: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
         body {
@@ -46,7 +46,7 @@
         }
         .input-field {
             border: 1px solid var(--border-color);
-            background-color: var(--bg-color);
+            background-color: #fff;
             border-radius: 0.5rem;
             padding: 0.75rem;
             font-size: 0.9rem;
@@ -56,7 +56,7 @@
         .input-field:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
         }
         .btn-primary {
             background-color: var(--primary-color);
@@ -83,6 +83,12 @@
         .invoice-table th, .invoice-table td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        .invoice-table th {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: #4b5563;
         }
         .total-box {
             background-color: var(--bg-color);
@@ -90,25 +96,11 @@
             border-radius: 0.5rem;
             box-shadow: var(--shadow-light);
         }
-        /* Mobile-first approach: responsive design */
-        @media (max-width: 767px) {
-            .invoice-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .invoice-header > div:last-child {
-                text-align: left;
-                margin-top: 1.5rem;
-            }
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            .invoice-table th, .invoice-table td {
-                padding: 0.75rem;
-                font-size: 0.8rem;
-            }
+        .total-box span {
+            font-family: 'Montserrat', sans-serif;
         }
-        /* Ocultar botones en la vista de impresión */
+        
+        /* Ocultar elementos en la vista de impresión */
         @media print {
             .no-print {
                 display: none !important;
@@ -119,6 +111,14 @@
             }
             #invoice-container {
                 box-shadow: none;
+                width: 210mm;
+                height: 297mm;
+                padding: 20mm;
+            }
+            /* Estilos para la impresión */
+            .input-as-text {
+                display: block !important;
+                margin-bottom: 0.5rem;
             }
         }
     </style>
@@ -128,9 +128,9 @@
     <div id="invoice-container" class="container bg-white">
         <div class="invoice-paper">
             <div class="flex flex-col md:flex-row justify-between items-start invoice-header">
-                <div class="flex-1">
-                    <h1 class="text-2xl font-bold text-gray-800">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h1>
-                    <p class="text-sm text-gray-600 mt-1">76779007Q</p>
+                <div class="flex-1 text-left">
+                    <h1 class="text-2xl font-bold text-gray-800" style="font-family: 'Montserrat', sans-serif;">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h1>
+                    <p class="text-sm text-gray-600">76779007Q</p>
                     <p class="text-sm text-gray-600">Calle Carcasía 44B 1ºF edf Los Rosales</p>
                     <p class="text-sm text-gray-600">Noia 15200</p>
                 </div>
@@ -193,10 +193,11 @@
                     </div>
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm font-medium">IVA</span>
-                        <select id="iva-selector" class="input-field w-auto ml-2">
+                        <select id="iva-selector" class="input-field w-auto ml-2 no-print">
                             <option value="21">21%</option>
                             <option value="0">0% (Sin IVA)</option>
                         </select>
+                        <span id="iva-print-text" class="text-lg font-bold" style="display: none;"></span>
                         <span id="iva" class="text-lg font-bold">0.00 €</span>
                     </div>
                     <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300">
@@ -288,8 +289,8 @@
                 // Ocultamos todos los botones con la clase 'no-print'
                 document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
                 
-                // Convertimos los inputs a texto para el PDF
-                document.querySelectorAll('input').forEach(input => {
+                // Convertimos los inputs a texto y los mostramos en la factura
+                document.querySelectorAll('.input-field').forEach(input => {
                     const value = input.value;
                     if (value) {
                         const span = document.createElement('span');
@@ -299,6 +300,12 @@
                     }
                     input.style.display = 'none';
                 });
+                
+                // Mostramos el valor del IVA como texto para la impresión
+                const ivaText = ivaSelector.options[ivaSelector.selectedIndex].text;
+                const ivaPrintText = document.getElementById('iva-print-text');
+                ivaPrintText.textContent = ivaText;
+                ivaPrintText.style.display = 'inline';
 
                 html2canvas(invoiceContainer, {
                     scale: 2,
@@ -330,7 +337,8 @@
                     // Restauramos los elementos de la interfaz después de la exportación
                     document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
                     document.querySelectorAll('.input-as-text').forEach(span => span.remove());
-                    document.querySelectorAll('input').forEach(input => input.style.display = '');
+                    document.querySelectorAll('.input-field').forEach(input => input.style.display = '');
+                    ivaPrintText.style.display = 'none';
                 });
             }
 
