@@ -97,6 +97,10 @@
         .invoice-table tr:hover {
             background-color: #f1f5f9;
         }
+        /* Estilos adicionales para los nuevos elementos */
+        .item-row input, .item-row textarea {
+            padding: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center p-8">
@@ -106,18 +110,14 @@
             <div class="flex-1 pr-4">
                 <div class="flex-col">
                     <h2 class="text-xl font-bold mb-2">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h2>
-                    <p class="text-sm">76779007Q</p>
-                    <p class="text-sm">C/ Carcasía 44B - 1F</p>
-                    <p class="text-sm">15200 Noia - A Coruña</p>
+                    <textarea id="emisor-address" rows="4" class="text-sm p-2 w-full border border-gray-300 rounded-md" placeholder="76779007Q&#10;C/ Carcasía 44B - 1F&#10;15200 Noia - A Coruña"></textarea>
                 </div>
             </div>
 
             <div class="flex-1 pl-4 text-right">
                 <div class="flex-col">
-                    <h2 class="text-xl font-bold mb-2">AYASO SOBRIDO S.L.</h2>
-                    <p class="text-sm">Lg. Bretal 252</p>
-                    <p class="text-sm">15969 Ribeira</p>
-                    <p class="text-sm">A Coruña</p>
+                    <input type="text" id="receptor-name" class="text-xl font-bold mb-2 w-full text-right" placeholder="Nombre del receptor">
+                    <textarea id="receptor-address" rows="4" class="text-sm p-2 w-full text-right border border-gray-300 rounded-md" placeholder="Dirección del receptor"></textarea>
                 </div>
             </div>
         </div>
@@ -129,7 +129,7 @@
             </div>
             <div class="input-group">
                 <label for="num-factura">Nº FACTURA</label>
-                <input type="text" id="num-factura" class="mt-1 block w-full rounded-md shadow-sm border-gray-300">
+                <input type="text" id="num-factura" class="mt-1 block w-full rounded-md shadow-sm border-gray-300" readonly>
             </div>
             <div class="input-group">
                 <label for="cif-nif">C.I.F./N.I.F.</label>
@@ -150,6 +150,7 @@
                         <th class="w-1/6">CANT.</th>
                         <th class="w-1/6">PRECIO</th>
                         <th class="w-1/6">IMPORTE</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody id="items-body">
@@ -167,7 +168,11 @@
                     <span id="subtotal" class="text-lg font-bold">0.00 €</span>
                 </div>
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium">IVA (21%)</span>
+                    <span class="text-sm font-medium">IVA</span>
+                    <select id="iva-selector" class="w-auto ml-2">
+                        <option value="21">21%</option>
+                        <option value="0">0% (Sin IVA)</option>
+                    </select>
                     <span id="iva" class="text-lg font-bold">0.00 €</span>
                 </div>
                 <div class="flex justify-between items-center pt-4 border-t border-gray-300">
@@ -182,5 +187,84 @@
         </div>
 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const dateInput = document.getElementById('fecha');
+            const invoiceNumberInput = document.getElementById('num-factura');
+            const itemsBody = document.getElementById('items-body');
+            const addItemBtn = document.getElementById('add-item-btn');
+            const ivaSelector = document.getElementById('iva-selector');
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+
+            // Generate invoice number
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            invoiceNumberInput.value = `${year}/${month}/`;
+            
+            // Function to update totals
+            function updateTotals() {
+                let subtotal = 0;
+                itemsBody.querySelectorAll('tr').forEach(row => {
+                    const importe = parseFloat(row.querySelector('.item-importe').value);
+                    if (!isNaN(importe)) {
+                        subtotal += importe;
+                    }
+                });
+                
+                const ivaRate = parseFloat(ivaSelector.value) / 100;
+                const ivaAmount = subtotal * ivaRate;
+                const total = subtotal + ivaAmount;
+                
+                document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)} €`;
+                document.getElementById('iva').textContent = `${ivaAmount.toFixed(2)} €`;
+                document.getElementById('total').textContent = `${total.toFixed(2)} €`;
+            }
+
+            // Function to calculate and update item total
+            function updateItemTotal(row) {
+                const cant = parseFloat(row.querySelector('.item-cant').value) || 0;
+                const precio = parseFloat(row.querySelector('.item-precio').value) || 0;
+                const importe = cant * precio;
+                row.querySelector('.item-importe').value = importe.toFixed(2);
+                updateTotals();
+            }
+
+            // Function to add a new item row
+            function addItem() {
+                const newRow = document.createElement('tr');
+                newRow.className = 'item-row';
+                newRow.innerHTML = `
+                    <td><input type="text" class="w-full item-descripcion" placeholder="Descripción"></td>
+                    <td><input type="number" class="w-full item-cant" value="0" step="any"></td>
+                    <td><input type="number" class="w-full item-precio" value="0.00" step="0.01"></td>
+                    <td><input type="text" class="w-full item-importe" value="0.00" readonly></td>
+                    <td><button type="button" class="remove-item-btn text-red-500 hover:text-red-700">Eliminar</button></td>
+                `;
+                
+                itemsBody.appendChild(newRow);
+                
+                const cantInput = newRow.querySelector('.item-cant');
+                const precioInput = newRow.querySelector('.item-precio');
+                const removeBtn = newRow.querySelector('.remove-item-btn');
+
+                cantInput.addEventListener('input', () => updateItemTotal(newRow));
+                precioInput.addEventListener('input', () => updateItemTotal(newRow));
+                removeBtn.addEventListener('click', () => {
+                    newRow.remove();
+                    updateTotals();
+                });
+
+                updateTotals();
+            }
+
+            addItemBtn.addEventListener('click', addItem);
+            ivaSelector.addEventListener('change', updateTotals);
+        });
+    </script>
 </body>
 </html>
