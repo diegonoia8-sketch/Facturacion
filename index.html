@@ -118,9 +118,9 @@
             <div class="flex-1 pr-4">
                 <div class="flex-col">
                     <h2 class="text-xl font-bold mb-2">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h2>
-                    <input type="text" id="emisor-nif" class="text-sm p-2 w-full border border-gray-300 rounded-md mb-1" placeholder="NIF/DNI">
-                    <input type="text" id="emisor-calle" class="text-sm p-2 w-full border border-gray-300 rounded-md mb-1" placeholder="Calle y número">
-                    <input type="text" id="emisor-cp-ciudad" class="text-sm p-2 w-full border border-gray-300 rounded-md mb-1" placeholder="Código postal y ciudad">
+                    <p class="text-sm">76779007Q</p>
+                    <p class="text-sm">Calle Carcasía 44B 1ºF edf Los Rosales</p>
+                    <p class="text-sm">Noia 15200</p>
                 </div>
             </div>
 
@@ -140,7 +140,7 @@
             </div>
             <div class="input-group">
                 <label for="num-factura">Nº FACTURA</label>
-                <input type="text" id="num-factura" class="mt-1 block w-full rounded-md shadow-sm border-gray-300" readonly>
+                <input type="text" id="num-factura" class="mt-1 block w-full rounded-md shadow-sm border-gray-300">
             </div>
             <div class="input-group">
                 <label for="cif-nif">C.I.F./N.I.F.</label>
@@ -171,6 +171,10 @@
                 Añadir partida
             </button>
         </div>
+        
+        <div class="mt-8 mb-4">
+            <p class="text-xs text-gray-500">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
+        </div>
 
         <div class="flex justify-end">
             <div class="w-1/2">
@@ -193,10 +197,6 @@
             </div>
         </div>
 
-        <div class="mt-8">
-            <p class="text-xs text-gray-500">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
-        </div>
-
     </div>
 
     <div class="mt-6">
@@ -208,7 +208,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const dateInput = document.getElementById('fecha');
-            const invoiceNumberInput = document.getElementById('num-factura');
             const itemsBody = document.getElementById('items-body');
             const addItemBtn = document.getElementById('add-item-btn');
             const ivaSelector = document.getElementById('iva-selector');
@@ -218,12 +217,6 @@
             // Set default date to today
             const today = new Date().toISOString().split('T')[0];
             dateInput.value = today;
-
-            // Generate invoice number
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            invoiceNumberInput.value = `${year}/${month}/`;
             
             // Function to update totals
             function updateTotals() {
@@ -283,19 +276,20 @@
 
             // Function to export as PDF
             function exportPDF() {
-                // Ocultamos los botones y los inputs no esenciales para el PDF
-                const nonPrintableElements = [addItemBtn, exportPdfBtn, ...document.querySelectorAll('.item-row input, .item-row textarea, #emisor-nif, #emisor-calle, #emisor-cp-ciudad, #receptor-name, #receptor-calle, #receptor-cp-ciudad')];
-                nonPrintableElements.forEach(el => el.style.display = 'none');
+                // Ocultamos los botones antes de la captura de pantalla
+                addItemBtn.style.display = 'none';
+                exportPdfBtn.style.display = 'none';
                 
-                // Aseguramos que los textos de los inputs se muestren
-                const printableTexts = [
-                    ...document.querySelectorAll('#emisor-nif, #emisor-calle, #emisor-cp-ciudad, #receptor-name, #receptor-calle, #receptor-cp-ciudad, #fecha, #num-factura, #cif-nif, #obra, .item-descripcion, .item-cant, .item-precio, .item-importe')
-                ];
-                printableTexts.forEach(el => {
-                    if (el.tagName === 'INPUT') {
-                        el.parentNode.innerHTML += `<span>${el.value}</span>`;
-                        el.style.display = 'none';
+                // Convertimos los inputs a texto para el PDF
+                document.querySelectorAll('input').forEach(input => {
+                    const value = input.value;
+                    if (value) {
+                        const span = document.createElement('span');
+                        span.textContent = value;
+                        span.className = 'input-as-text';
+                        input.parentNode.insertBefore(span, input);
                     }
+                    input.style.display = 'none';
                 });
 
                 html2canvas(invoiceContainer, {
@@ -323,11 +317,13 @@
                     const y = (pdfHeight - newHeight) / 2;
                     
                     pdf.addImage(imgData, 'PNG', x, y, newWidth, newHeight);
-                    pdf.save(`Factura_${invoiceNumberInput.value.replace(/\//g, '-')}.pdf`);
+                    pdf.save(`Factura_${document.getElementById('num-factura').value.replace(/\//g, '-')}.pdf`);
 
                     // Restauramos los elementos de la interfaz después de la exportación
-                    nonPrintableElements.forEach(el => el.style.display = 'block');
-                    document.querySelectorAll('#invoice-container span').forEach(el => el.remove());
+                    addItemBtn.style.display = 'block';
+                    exportPdfBtn.style.display = 'block';
+                    document.querySelectorAll('.input-as-text').forEach(span => span.remove());
+                    document.querySelectorAll('input').forEach(input => input.style.display = 'block');
                 });
             }
 
