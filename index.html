@@ -8,199 +8,208 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f5f7fa;
-            --sidebar-color: #ffffff;
-            --text-color: #1e293b;
-            --text-muted: #64748b;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
+            --bg-color: #f0f4f8;
+            --invoice-bg: #ffffff;
+            --text-color: #334155;
+            --primary-color: #3b82f6;
+            --accent-color: #60a5fa;
             --border-color: #e2e8f0;
-            --radius: 8px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
-            min-height: 100vh;
+            background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.5;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
         }
         .invoice-paper {
-            background-color: white;
+            background-color: var(--invoice-bg);
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        .invoice-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-field {
             border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-        .invoice-paper:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-            transform: translateY(-2px);
-        }
-        .logo-placeholder {
-            display: none; /* Ocultamos el logo por completo */
-        }
-        .divider {
-            border-top: 1px solid var(--border-color);
-            opacity: 0.5;
-        }
-        .total-box {
-            background-color: var(--sidebar-color);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.95);
-        }
-        input, select {
             background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
+            border-radius: 0.5rem;
             padding: 0.75rem;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            width: 100%;
-            box-shadow: var(--shadow);
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-        }
-        .input-group label {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-        .input-group {
-            margin-bottom: 1rem;
-        }
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
             font-size: 0.9rem;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-light);
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #4b5563;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
         }
         .invoice-table th, .invoice-table td {
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
         }
-        .invoice-table th {
-            background-color: #f8fafc;
-            font-weight: 600;
+        .total-box {
+            background-color: var(--bg-color);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-light);
         }
-        .invoice-table tr:hover {
-            background-color: #f1f5f9;
+        /* Mobile-first approach: responsive design */
+        @media (max-width: 767px) {
+            .invoice-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .invoice-header > div:last-child {
+                text-align: left;
+                margin-top: 1.5rem;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .invoice-table th, .invoice-table td {
+                padding: 0.75rem;
+                font-size: 0.8rem;
+            }
         }
-        .item-row input, .item-row textarea {
-            padding: 0.5rem;
-        }
-        /* Ajuste para la vista de la factura en el navegador */
-        #invoice-container {
-            width: 210mm; /* Ancho de un A4 */
-            min-height: 297mm; /* Alto de un A4 */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 30mm; /* Márgenes para el contenido */
-            box-sizing: border-box;
+        /* Ocultar botones en la vista de impresión */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+                background-color: white;
+            }
+            #invoice-container {
+                box-shadow: none;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100 flex flex-col items-center justify-center p-8">
+<body class="bg-gray-100 flex flex-col items-center justify-center">
 
-    <div id="invoice-container" class="bg-white rounded-lg">
+    <div id="invoice-container" class="container bg-white">
+        <div class="invoice-paper">
+            <div class="flex flex-col md:flex-row justify-between items-start invoice-header">
+                <div class="flex-1">
+                    <h1 class="text-2xl font-bold text-gray-800">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h1>
+                    <p class="text-sm text-gray-600 mt-1">76779007Q</p>
+                    <p class="text-sm text-gray-600">Calle Carcasía 44B 1ºF edf Los Rosales</p>
+                    <p class="text-sm text-gray-600">Noia 15200</p>
+                </div>
 
-        <div class="flex justify-between items-start mb-8">
-            <div class="flex-1 pr-4">
-                <div class="flex-col">
-                    <h2 class="text-xl font-bold mb-2">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h2>
-                    <p class="text-sm">76779007Q</p>
-                    <p class="text-sm">Calle Carcasía 44B 1ºF edf Los Rosales</p>
-                    <p class="text-sm">Noia 15200</p>
+                <div class="flex-1 md:text-right mt-4 md:mt-0">
+                    <input type="text" id="receptor-name" class="input-field w-full md:w-auto text-xl font-bold mb-2 md:text-right" placeholder="Nombre del receptor">
+                    <input type="text" id="receptor-calle" class="input-field w-full md:w-auto text-sm mb-1 md:text-right" placeholder="Calle y número">
+                    <input type="text" id="receptor-cp-ciudad" class="input-field w-full md:w-auto text-sm md:text-right" placeholder="Código postal y ciudad">
                 </div>
             </div>
 
-            <div class="flex-1 pl-4 text-right">
-                <div class="flex-col">
-                    <input type="text" id="receptor-name" class="text-xl font-bold mb-2 w-full text-right" placeholder="Nombre del receptor">
-                    <input type="text" id="receptor-calle" class="text-sm p-2 w-full text-right border border-gray-300 rounded-md mb-1" placeholder="Calle y número">
-                    <input type="text" id="receptor-cp-ciudad" class="text-sm p-2 w-full text-right border border-gray-300 rounded-md mb-1" placeholder="Código postal y ciudad">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 info-grid">
+                <div class="input-group">
+                    <label for="fecha" class="text-sm font-medium text-gray-500">FECHA</label>
+                    <input type="date" id="fecha" class="input-field mt-1 block w-full">
+                </div>
+                <div class="input-group">
+                    <label for="num-factura" class="text-sm font-medium text-gray-500">Nº FACTURA</label>
+                    <input type="text" id="num-factura" class="input-field mt-1 block w-full" placeholder="Introduce el Nº de factura">
+                </div>
+                <div class="input-group">
+                    <label for="cif-nif" class="text-sm font-medium text-gray-500">C.I.F./N.I.F.</label>
+                    <input type="text" id="cif-nif" class="input-field mt-1 block w-full" placeholder="Introduce el CIF">
+                </div>
+            </div>
+
+            <div class="input-group mb-8">
+                <label for="obra" class="text-sm font-medium text-gray-500">OBRA</label>
+                <input type="text" id="obra" class="input-field mt-1 block w-full" placeholder="Nombre de obra">
+            </div>
+
+            <div class="mb-8">
+                <table class="invoice-table w-full">
+                    <thead>
+                        <tr class="text-left font-medium text-gray-600">
+                            <th class="w-1/2">DESCRIPCIÓN</th>
+                            <th class="w-1/6">CANT.</th>
+                            <th class="w-1/6">PRECIO</th>
+                            <th class="w-1/6">IMPORTE</th>
+                            <th class="no-print"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="items-body">
+                        </tbody>
+                </table>
+                <button id="add-item-btn" class="no-print btn-secondary mt-4 block w-full md:w-auto">
+                    Añadir partida
+                </button>
+            </div>
+            
+            <div class="mt-8 mb-4">
+                <p class="text-xs text-gray-500">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
+            </div>
+
+            <div class="flex justify-end">
+                <div class="w-full md:w-1/2 total-box">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium">SUBTOTAL</span>
+                        <span id="subtotal" class="text-lg font-bold">0.00 €</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium">IVA</span>
+                        <select id="iva-selector" class="input-field w-auto ml-2">
+                            <option value="21">21%</option>
+                            <option value="0">0% (Sin IVA)</option>
+                        </select>
+                        <span id="iva" class="text-lg font-bold">0.00 €</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300">
+                        <span class="text-xl font-bold">TOTAL</span>
+                        <span id="total" class="text-xl font-bold text-blue-600">0.00 €</span>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="grid grid-cols-3 gap-4 mb-8">
-            <div class="input-group">
-                <label for="fecha">FECHA</label>
-                <input type="date" id="fecha" class="mt-1 block w-full rounded-md shadow-sm border-gray-300">
-            </div>
-            <div class="input-group">
-                <label for="num-factura">Nº FACTURA</label>
-                <input type="text" id="num-factura" class="mt-1 block w-full rounded-md shadow-sm border-gray-300">
-            </div>
-            <div class="input-group">
-                <label for="cif-nif">C.I.F./N.I.F.</label>
-                <input type="text" id="cif-nif" class="mt-1 block w-full rounded-md shadow-sm border-gray-300">
-            </div>
-        </div>
-
-        <div class="input-group mb-8">
-            <label for="obra">OBRA</label>
-            <input type="text" id="obra" class="mt-1 block w-full rounded-md shadow-sm border-gray-300" placeholder="Nombre de obra">
-        </div>
-
-        <div class="mb-8">
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th class="w-1/2">DESCRIPCIÓN</th>
-                        <th class="w-1/6">CANT.</th>
-                        <th class="w-1/6">PRECIO</th>
-                        <th class="w-1/6">IMPORTE</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="items-body">
-                    </tbody>
-            </table>
-            <button id="add-item-btn" class="mt-4 px-4 py-2 bg-gray-200 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-300 transition-colors">
-                Añadir partida
-            </button>
-        </div>
-        
-        <div class="mt-8 mb-4">
-            <p class="text-xs text-gray-500">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
-        </div>
-
-        <div class="flex justify-end">
-            <div class="w-1/2">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium">SUBTOTAL</span>
-                    <span id="subtotal" class="text-lg font-bold">0.00 €</span>
-                </div>
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium">IVA</span>
-                    <select id="iva-selector" class="w-auto ml-2">
-                        <option value="21">21%</option>
-                        <option value="0">0% (Sin IVA)</option>
-                    </select>
-                    <span id="iva" class="text-lg font-bold">0.00 €</span>
-                </div>
-                <div class="flex justify-between items-center pt-4 border-t border-gray-300">
-                    <span class="text-xl font-bold">TOTAL</span>
-                    <span id="total" class="text-xl font-bold text-blue-600">0.00 €</span>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <div class="mt-6">
-        <button id="export-pdf-btn" class="px-6 py-3 bg-blue-600 text-white rounded-md text-lg font-medium hover:bg-blue-700 transition-colors">
+    <div class="mt-6 no-print">
+        <button id="export-pdf-btn" class="btn-primary w-full md:w-auto">
             Exportar a PDF
         </button>
     </div>
@@ -251,11 +260,11 @@
                 const newRow = document.createElement('tr');
                 newRow.className = 'item-row';
                 newRow.innerHTML = `
-                    <td><input type="text" class="w-full item-descripcion" placeholder="Descripción"></td>
-                    <td><input type="number" class="w-full item-cant" value="0" step="any"></td>
-                    <td><input type="number" class="w-full item-precio" value="0.00" step="0.01"></td>
-                    <td><input type="text" class="w-full item-importe" value="0.00" readonly></td>
-                    <td><button type="button" class="remove-item-btn text-red-500 hover:text-red-700">Eliminar</button></td>
+                    <td><input type="text" class="input-field w-full item-descripcion" placeholder="Descripción"></td>
+                    <td><input type="number" class="input-field w-full item-cant" value="0" step="any"></td>
+                    <td><input type="number" class="input-field w-full item-precio" value="0.00" step="0.01"></td>
+                    <td><input type="text" class="input-field w-full item-importe" value="0.00" readonly></td>
+                    <td><button type="button" class="remove-item-btn btn-secondary no-print">Eliminar</button></td>
                 `;
                 
                 itemsBody.appendChild(newRow);
@@ -276,9 +285,8 @@
 
             // Function to export as PDF
             function exportPDF() {
-                // Ocultamos los botones antes de la captura de pantalla
-                addItemBtn.style.display = 'none';
-                exportPdfBtn.style.display = 'none';
+                // Ocultamos todos los botones con la clase 'no-print'
+                document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
                 
                 // Convertimos los inputs a texto para el PDF
                 document.querySelectorAll('input').forEach(input => {
@@ -320,10 +328,9 @@
                     pdf.save(`Factura_${document.getElementById('num-factura').value.replace(/\//g, '-')}.pdf`);
 
                     // Restauramos los elementos de la interfaz después de la exportación
-                    addItemBtn.style.display = 'block';
-                    exportPdfBtn.style.display = 'block';
+                    document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
                     document.querySelectorAll('.input-as-text').forEach(span => span.remove());
-                    document.querySelectorAll('input').forEach(input => input.style.display = 'block');
+                    document.querySelectorAll('input').forEach(input => input.style.display = '');
                 });
             }
 
