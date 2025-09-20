@@ -7,99 +7,110 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --invoice-bg: #ffffff;
-            --text-color: #1f2937;
-            --primary-color: #2563eb;
-            --accent-color: #3b82f6;
-            --border-color: #e5e7eb;
-            --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --bg-color: #f0f4f8;
+            --container-bg: #ffffff;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --primary-color: #3498db;
+            --accent-color: #2980b9;
+            --border-color: #e0e6ed;
+            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
             --shadow-medium: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', sans-serif;
             line-height: 1.6;
             padding: 2rem 1rem;
         }
+
         .container {
             max-width: 1000px;
             margin: auto;
             border-radius: 1rem;
             box-shadow: var(--shadow-medium);
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
+
         .invoice-paper {
-            background-color: var(--invoice-bg);
-            padding: 2rem;
-            box-sizing: border-box;
+            background-color: var(--container-bg);
+            padding: 3rem;
         }
-        .invoice-header {
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
+
         .input-field {
             border: 1px solid var(--border-color);
-            background-color: #fff;
+            background-color: #f8f9fa;
             border-radius: 0.5rem;
             padding: 0.75rem;
             font-size: 0.9rem;
             transition: all 0.2s;
-            box-shadow: var(--shadow-light);
         }
+
         .input-field:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
         }
+
         .btn-primary {
             background-color: var(--primary-color);
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
-            font-weight: 600;
+            font-weight: 500;
             transition: background-color 0.2s;
+            box-shadow: var(--shadow-light);
         }
+
         .btn-primary:hover {
             background-color: var(--accent-color);
         }
+
         .btn-secondary {
-            background-color: #e2e8f0;
-            color: #4b5563;
+            background-color: #ecf0f1;
+            color: var(--text-color);
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
-            font-weight: 500;
+            font-weight: 400;
             transition: background-color 0.2s;
         }
+
         .btn-secondary:hover {
-            background-color: #cbd5e1;
+            background-color: #bdc3c7;
         }
+
         .invoice-table th, .invoice-table td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem;
         }
+        
         .invoice-table th {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Roboto', sans-serif;
             font-weight: 700;
-            color: #4b5563;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
+
         .total-box {
-            background-color: var(--bg-color);
-            padding: 1rem 1.5rem;
+            background-color: #ecf0f1;
+            padding: 1.5rem;
             border-radius: 0.5rem;
             box-shadow: var(--shadow-light);
+            border: 1px solid #dcdfe4;
         }
+
         .total-box span {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Playfair Display', serif;
         }
-        
+
         /* Ocultar elementos en la vista de impresión */
         @media print {
             .no-print {
@@ -115,7 +126,9 @@
                 height: 297mm;
                 padding: 20mm;
             }
-            /* Estilos para la impresión */
+            .invoice-paper {
+                padding: 0;
+            }
             .input-as-text {
                 display: block !important;
                 margin-bottom: 0.5rem;
@@ -125,84 +138,87 @@
 </head>
 <body class="bg-gray-100 flex flex-col items-center justify-center">
 
-    <div id="invoice-container" class="container bg-white">
+    <div id="invoice-container" class="container">
         <div class="invoice-paper">
-            <div class="flex flex-col md:flex-row justify-between items-start invoice-header">
-                <div class="flex-1 text-left">
-                    <h1 class="text-2xl font-bold text-gray-800" style="font-family: 'Montserrat', sans-serif;">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h1>
-                    <p class="text-sm text-gray-600">76779007Q</p>
-                    <p class="text-sm text-gray-600">Calle Carcasía 44B 1ºF edf Los Rosales</p>
-                    <p class="text-sm text-gray-600">Noia 15200</p>
+            <div class="flex justify-between items-start mb-12">
+                <div id="receptor-info-display" class="w-1/2">
+                    <h2 class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">Factura</h2>
+                    <div id="receptor-inputs" class="no-print mt-4">
+                        <input type="text" id="receptor-name" class="input-field w-full mb-2" placeholder="Nombre del receptor">
+                        <input type="text" id="receptor-calle" class="input-field w-full mb-2" placeholder="Calle y número">
+                        <input type="text" id="receptor-cp-ciudad" class="input-field w-full" placeholder="Código postal y ciudad">
+                    </div>
                 </div>
-
-                <div class="flex-1 md:text-right mt-4 md:mt-0">
-                    <input type="text" id="receptor-name" class="input-field w-full md:w-auto text-xl font-bold mb-2 md:text-right" placeholder="Nombre del receptor">
-                    <input type="text" id="receptor-calle" class="input-field w-full md:w-auto text-sm mb-1 md:text-right" placeholder="Calle y número">
-                    <input type="text" id="receptor-cp-ciudad" class="input-field w-full md:w-auto text-sm md:text-right" placeholder="Código postal y ciudad">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 info-grid">
-                <div class="input-group">
-                    <label for="fecha" class="text-sm font-medium text-gray-500">FECHA</label>
-                    <input type="date" id="fecha" class="input-field mt-1 block w-full">
-                </div>
-                <div class="input-group">
-                    <label for="num-factura" class="text-sm font-medium text-gray-500">Nº FACTURA</label>
-                    <input type="text" id="num-factura" class="input-field mt-1 block w-full" placeholder="Introduce el Nº de factura">
-                </div>
-                <div class="input-group">
-                    <label for="cif-nif" class="text-sm font-medium text-gray-500">C.I.F./N.I.F.</label>
-                    <input type="text" id="cif-nif" class="input-field mt-1 block w-full" placeholder="Introduce el CIF">
+                
+                <div class="text-right w-1/2">
+                    <h1 class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">FRANCISCO JAVIER PAZÓ MARTÍNEZ</h1>
+                    <p class="text-sm text-gray-500 mt-2">76779007Q</p>
+                    <p class="text-sm text-gray-500">Calle Carcasía 44B 1ºF edf Los Rosales</p>
+                    <p class="text-sm text-gray-500">Noia 15200</p>
                 </div>
             </div>
 
-            <div class="input-group mb-8">
-                <label for="obra" class="text-sm font-medium text-gray-500">OBRA</label>
-                <input type="text" id="obra" class="input-field mt-1 block w-full" placeholder="Nombre de obra">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 info-grid">
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 block mb-1">FECHA</label>
+                    <input type="date" id="fecha" class="input-field w-full">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 block mb-1">Nº FACTURA</label>
+                    <input type="text" id="num-factura" class="input-field w-full" placeholder="Introduce el Nº de factura">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 block mb-1">C.I.F./N.I.F.</label>
+                    <input type="text" id="cif-nif" class="input-field w-full" placeholder="Introduce el CIF">
+                </div>
             </div>
 
-            <div class="mb-8">
-                <table class="invoice-table w-full">
+            <div class="mb-12">
+                <label class="text-xs font-semibold text-gray-500 block mb-1">OBRA</label>
+                <input type="text" id="obra" class="input-field w-full" placeholder="Nombre de obra">
+            </div>
+
+            <div class="mb-12">
+                <table class="invoice-table w-full border-collapse">
                     <thead>
-                        <tr class="text-left font-medium text-gray-600">
-                            <th class="w-1/2">DESCRIPCIÓN</th>
-                            <th class="w-1/6">CANT.</th>
-                            <th class="w-1/6">PRECIO</th>
-                            <th class="w-1/6">IMPORTE</th>
-                            <th class="no-print"></th>
+                        <tr>
+                            <th class="text-left w-1/2">DESCRIPCIÓN</th>
+                            <th class="text-left w-1/6">CANT.</th>
+                            <th class="text-left w-1/6">PRECIO</th>
+                            <th class="text-right w-1/6">IMPORTE</th>
+                            <th class="no-print w-10"></th>
                         </tr>
                     </thead>
                     <tbody id="items-body">
                         </tbody>
                 </table>
-                <button id="add-item-btn" class="no-print btn-secondary mt-4 block w-full md:w-auto">
+                <button id="add-item-btn" class="no-print btn-secondary mt-6 px-4 py-2 rounded-md font-medium text-sm">
                     Añadir partida
                 </button>
             </div>
             
-            <div class="mt-8 mb-4">
-                <p class="text-xs text-gray-500">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
-            </div>
+            <div class="flex flex-col md:flex-row justify-between items-end">
+                <div class="flex-1 mt-6 md:mt-0">
+                    <p class="text-xs text-gray-500">Operación con inversión del sujeto pasivo conforme al Art. 84 de la ley de I.V.A. 37/1992</p>
+                </div>
 
-            <div class="flex justify-end">
-                <div class="w-full md:w-1/2 total-box">
-                    <div class="flex justify-between items-center mb-2">
+                <div class="w-full md:w-1/2 total-box mt-6 md:mt-0">
+                    <div class="flex justify-between items-center mb-4">
                         <span class="text-sm font-medium">SUBTOTAL</span>
-                        <span id="subtotal" class="text-lg font-bold">0.00 €</span>
+                        <span id="subtotal" class="text-xl font-bold">0.00 €</span>
                     </div>
-                    <div class="flex justify-between items-center mb-2">
+                    <div class="flex justify-between items-center mb-4">
                         <span class="text-sm font-medium">IVA</span>
                         <select id="iva-selector" class="input-field w-auto ml-2 no-print">
                             <option value="21">21%</option>
                             <option value="0">0% (Sin IVA)</option>
                         </select>
-                        <span id="iva-print-text" class="text-lg font-bold" style="display: none;"></span>
-                        <span id="iva" class="text-lg font-bold">0.00 €</span>
+                        <span id="iva-print-text" class="text-xl font-bold" style="display: none;"></span>
+                        <span id="iva" class="text-xl font-bold">0.00 €</span>
                     </div>
                     <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300">
-                        <span class="text-xl font-bold">TOTAL</span>
-                        <span id="total" class="text-xl font-bold text-blue-600">0.00 €</span>
+                        <span class="text-lg font-semibold">TOTAL</span>
+                        <span id="total" class="text-2xl font-bold text-primary-color">0.00 €</span>
                     </div>
                 </div>
             </div>
@@ -210,7 +226,7 @@
     </div>
 
     <div class="mt-6 no-print">
-        <button id="export-pdf-btn" class="btn-primary w-full md:w-auto">
+        <button id="export-pdf-btn" class="btn-primary">
             Exportar a PDF
         </button>
     </div>
@@ -265,7 +281,7 @@
                     <td><input type="number" class="input-field w-full item-cant" value="0" step="any"></td>
                     <td><input type="number" class="input-field w-full item-precio" value="0.00" step="0.01"></td>
                     <td><input type="text" class="input-field w-full item-importe" value="0.00" readonly></td>
-                    <td><button type="button" class="remove-item-btn btn-secondary no-print">Eliminar</button></td>
+                    <td class="no-print"><button type="button" class="remove-item-btn btn-secondary text-xs px-2 py-1">Eliminar</button></td>
                 `;
                 
                 itemsBody.appendChild(newRow);
@@ -286,7 +302,7 @@
 
             // Function to export as PDF
             function exportPDF() {
-                // Ocultamos todos los botones con la clase 'no-print'
+                // Ocultamos elementos de la interfaz
                 document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
                 
                 // Convertimos los inputs a texto y los mostramos en la factura
@@ -301,45 +317,76 @@
                     input.style.display = 'none';
                 });
                 
+                // Mostrar los datos del receptor de forma simétrica
+                const receptorInputsDiv = document.getElementById('receptor-inputs');
+                const receptorName = document.getElementById('receptor-name').value;
+                const receptorCalle = document.getElementById('receptor-calle').value;
+                const receptorCPCiudad = document.getElementById('receptor-cp-ciudad').value;
+                
+                if (receptorName || receptorCalle || receptorCPCiudad) {
+                    const receptorDisplayDiv = document.createElement('div');
+                    receptorDisplayDiv.className = 'w-1/2 print-only';
+                    receptorDisplayDiv.innerHTML = `
+                        <h2 class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">${receptorName}</h2>
+                        <p class="text-sm text-gray-500 mt-2">${receptorCalle}</p>
+                        <p class="text-sm text-gray-500">${receptorCPCiudad}</p>
+                    `;
+                    document.getElementById('receptor-info-display').appendChild(receptorDisplayDiv);
+                }
+
+                // Ocultar el div de inputs del receptor en la impresión
+                document.getElementById('receptor-inputs').style.display = 'none';
+                
                 // Mostramos el valor del IVA como texto para la impresión
                 const ivaText = ivaSelector.options[ivaSelector.selectedIndex].text;
                 const ivaPrintText = document.getElementById('iva-print-text');
                 ivaPrintText.textContent = ivaText;
                 ivaPrintText.style.display = 'inline';
 
-                html2canvas(invoiceContainer, {
-                    scale: 2,
-                    useCORS: true
-                }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jspdf.jsPDF({
-                        orientation: 'p',
-                        unit: 'mm',
-                        format: 'a4'
-                    });
-                    
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = pdf.internal.pageSize.getHeight();
-                    
-                    const imgWidth = canvas.width;
-                    const imgHeight = canvas.height;
-                    
-                    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                    const newWidth = imgWidth * ratio;
-                    const newHeight = imgHeight * ratio;
-                    
-                    const x = (pdfWidth - newWidth) / 2;
-                    const y = (pdfHeight - newHeight) / 2;
-                    
-                    pdf.addImage(imgData, 'PNG', x, y, newWidth, newHeight);
-                    pdf.save(`Factura_${document.getElementById('num-factura').value.replace(/\//g, '-')}.pdf`);
+                // Añadimos un pequeño retraso para que el DOM se actualice antes de la captura
+                setTimeout(() => {
+                    html2canvas(invoiceContainer, {
+                        scale: 2,
+                        useCORS: true,
+                        scrollY: -window.scrollY
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jspdf.jsPDF({
+                            orientation: 'p',
+                            unit: 'mm',
+                            format: 'a4'
+                        });
+                        
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = pdf.internal.pageSize.getHeight();
+                        
+                        const imgWidth = canvas.width;
+                        const imgHeight = canvas.height;
+                        
+                        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                        const newWidth = imgWidth * ratio;
+                        const newHeight = imgHeight * ratio;
+                        
+                        const x = (pdfWidth - newWidth) / 2;
+                        const y = (pdfHeight - newHeight) / 2;
+                        
+                        pdf.addImage(imgData, 'PNG', x, y, newWidth, newHeight);
+                        pdf.save(`Factura_${document.getElementById('num-factura').value.replace(/\//g, '-')}.pdf`);
 
-                    // Restauramos los elementos de la interfaz después de la exportación
-                    document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
-                    document.querySelectorAll('.input-as-text').forEach(span => span.remove());
-                    document.querySelectorAll('.input-field').forEach(input => input.style.display = '');
-                    ivaPrintText.style.display = 'none';
-                });
+                        // Restauramos la interfaz después de la exportación
+                        document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+                        document.querySelectorAll('.input-as-text').forEach(span => span.remove());
+                        document.querySelectorAll('.input-field').forEach(input => input.style.display = '');
+                        document.getElementById('receptor-inputs').style.display = '';
+                        document.getElementById('iva-print-text').style.display = 'none';
+
+                        // Eliminar el div de visualización de datos del receptor
+                        const receptorDisplayDiv = document.querySelector('.print-only');
+                        if (receptorDisplayDiv) {
+                            receptorDisplayDiv.remove();
+                        }
+                    });
+                }, 500); // Pequeño retraso para asegurar el renderizado
             }
 
             addItemBtn.addEventListener('click', addItem);
