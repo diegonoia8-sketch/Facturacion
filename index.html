@@ -270,14 +270,12 @@
             document.getElementById('generateInvoice').addEventListener('click', () => {
                 const today = new Date();
                 
-                // Usar el número de factura manual
                 const manualInvoiceNumber = document.getElementById('numeroFacturaManual').value;
                 document.getElementById('invoiceNumber').textContent = manualInvoiceNumber;
                 
                 const fechaInput = document.getElementById('fecha').value;
                 document.getElementById('invoiceDate').textContent = fechaInput ? new Date(fechaInput).toLocaleDateString('es-ES') : today.toLocaleDateString('es-ES');
 
-                // Emisor (Datos Fijos) y Cliente
                 document.getElementById('previewEmisor').textContent = 'Francisco Javier Pazó Martínez';
                 document.getElementById('previewNif').textContent = 'DNI: 76779007Q';
                 document.getElementById('previewDireccion').textContent = 'Calle Carcasía 44B 1ºF edf Los Rosales.';
@@ -288,7 +286,6 @@
                 document.getElementById('previewDireccionCliente').textContent = document.getElementById('direccionCliente').value;
                 document.getElementById('previewCuentaBancaria').textContent = 'IBAN: ' + (document.getElementById('cuentaBancaria').value || 'ESXX XXXX XXXX XXXX XXXX XXXX');
 
-                // Items de la factura
                 const previewItems = document.getElementById('previewItems');
                 previewItems.innerHTML = '';
                 let baseImponible = 0;
@@ -331,21 +328,32 @@
                 html2canvas(element, { scale: 2 }).then(canvas => {
                     const imgData = canvas.toDataURL('image/png');
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const imgWidth = 210;
-                    const pageHeight = 297;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 0;
-
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-
-                    while (heightLeft > 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
+                    
+                    const pageWidth = 210; // Ancho A4 en mm
+                    const pageHeight = 297; // Alto A4 en mm
+                    
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    
+                    const canvasRatio = canvasWidth / canvasHeight;
+                    const pageRatio = pageWidth / pageHeight;
+                    
+                    let finalWidth, finalHeight;
+                    
+                    // Compara la proporción del canvas con la de la página para decidir si se ajusta por ancho o por alto
+                    if (canvasRatio > pageRatio) {
+                        finalWidth = pageWidth;
+                        finalHeight = pageWidth / canvasRatio;
+                    } else {
+                        finalHeight = pageHeight;
+                        finalWidth = pageHeight * canvasRatio;
                     }
+
+                    // Centrar la imagen en la página A4
+                    const x = (pageWidth - finalWidth) / 2;
+                    const y = (pageHeight - finalHeight) / 2;
+
+                    pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
                     
                     const invoiceNumber = document.getElementById('invoiceNumber').textContent.replace(/[\\/]/g, '-');
                     pdf.save(`factura-${invoiceNumber}.pdf`);
